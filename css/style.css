@@ -1,0 +1,43 @@
+/* Estilos modernos para la tarjeta del formulario */
+.card-custom {
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08) !important;
+}
+
+.card-header-custom {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border-bottom: none;
+}
+
+/* Estilos para que los inputs se vean más limpios */
+.form-control:focus, .form-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.15);
+}
+
+/* Contenedor del carrusel izquierdo fijo al hacer scroll */
+.left-sidebar {
+  position: sticky;
+  top: 2rem;
+}
+
+/* Diseño del carrusel de marcas */
+.carousel-inner.brands-wrapper {
+  border-radius: 1rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.carousel-item img {
+  object-fit: contain;
+  height: 140px;
+  width: 100%;
+  padding: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.carousel-item img:hover {
+  transform: scale(1.05);
+}
