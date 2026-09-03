@@ -12,7 +12,7 @@ const products = [
     {
         title: "Jordan 1 Low",
         description: "Inspiradas en los originales que se lanzaron en 1985, las Air Jordan 1 Low ofrecen un estilo clásico impecable que se ve familiar, pero siempre viene renovado. Con un diseño icónico que combina a la perfección con cualquier look, estas zapatillas garantizan que siempre lucirás excelente.",
-        buttonText: "Buy Now",
+        buttonText: "Comprar Ahora",
         images: [
             "img/zapatillas/jordan1.webp",
             "img/zapatillas/jordan3.webp",
@@ -22,7 +22,7 @@ const products = [
     {
         title: "Book 2 \"Tigers\"",
         description: "Devin Booker representa The Mitten con orgullo. Esta edición especial del Book 2 rinde homenaje a su estado natal luciendo la icónica D en inglés antiguo que cualquier fanático del béisbol reconoce, simbolizando la fortaleza y dureza que encarna el 313.",
-        buttonText: "Discover More",
+        buttonText: "Ver Catalogo",
          images: [
             "img/zapatillas/book21.webp",
             "img/zapatillas/book22.webp",

@@ -13,8 +13,8 @@
         <div class="container flex flex-col items-center justify-between p-6 mx-auto md:flex-row">
             
             <a href="#" class="mx-auto md:mx-0">
-                <img class="w-auto h-6 sm:h-7" src="https://merakiui.com/images/full-logo.svg" alt="Logo Merakiui">
-            </a>
+            <img class="w-24 h-12 sm:h-16 md:h-24" src="img/logo.png" alt="Logo SneakersX">
+            </a>    
 
             <div class="flex items-center justify-center mt-6 text-sm font-medium text-slate-600 capitalize md:mt-0">
                 <a href="index.html" class="mx-2 text-slate-900 border-b-2 border-blue-500 pb-1 sm:mx-4">Home</a>
@@ -38,40 +38,49 @@
             </div>
         </div>
     </nav>
-
-  
-    <div class="container flex flex-col px-6 pt-10 pb-16 mx-auto space-y-8 lg:pt-12 lg:pb-24 lg:flex-row lg:items-center">
+    <div class="container flex flex-col px-6 pt-6 pb-16 mx-auto lg:pt-10 lg:pb-24 lg:flex-row lg:items-center lg:justify-between">
         
-      
-        <div class="flex flex-row items-center w-full lg:w-1/2">
+        <div class="flex flex-row items-center w-full lg:w-1/2 lg:pr-10">
             
-      
-            <div id="product-dots" class="flex flex-col justify-center pr-8 space-y-4">
-                <!-- Se inyectan aquí -->
+    
+            <div id="product-dots" class="flex flex-col justify-center pr-6 space-y-4">
             </div>
-
-            <!-- Textos -->
-            <div class="max-w-lg">
-                <h1 id="product-title" class="text-3xl font-bold tracking-wide text-slate-800 lg:text-5xl transition-opacity duration-300">
-                   
+            <div class="flex-1 max-w-lg">
+                
+                <h1 id="product-title" class="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl transition-opacity duration-300">
                 </h1>
-                <p id="product-desc" class="mt-6 text-sm text-slate-500 leading-relaxed transition-opacity duration-300">
-             
+                
+                <p id="product-desc" class="mt-5 text-sm text-slate-500 leading-relaxed transition-opacity duration-300">
                 </p>
-                  <div class="mt-8">
-                      <a id="product-btn" href="productos.html" class="px-6 py-3 text-sm font-semibold tracking-wide text-white capitalize bg-[#2A65F3] rounded-lg shadow-md hover:bg-blue-600 focus:outline-none">
-                          Ver Productos
-                      </a>
-                  </div>
+
+                <div class="mt-8">
+                    <a id="product-btn" href="productos.html" class="inline-block px-6 py-3 text-sm font-semibold tracking-wide text-white capitalize transition-colors duration-300 transform bg-[#2A65F3] rounded-lg shadow-md hover:bg-blue-600 focus:outline-none">
+                        Compra Con Un 20% De Descuento
+                    </a>
+                </div>
+
+                <div class="flex items-center mt-8 space-x-6 text-[13px] font-medium text-slate-500">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Envío Gratis</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span>Devolución en 30 días</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-  
-        <div class="flex items-center justify-center w-full mt-10 lg:w-1/2 lg:mt-0">
-            <div class="relative w-full max-w-2xl h-80 lg:h-[28rem]">
-                <div class="absolute inset-0 bg-gray-200 rounded-xl shadow-inner mix-blend-multiply"></div>
-                <img id="product-image" class="object-cover w-full h-full rounded-xl shadow-lg transition-opacity duration-500 ease-in-out opacity-100" src="" alt="Product photo">
+        <div class="relative flex items-center justify-center w-full mt-12 lg:w-1/2 lg:mt-0">
+            
+            <div class="absolute w-56 h-56 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 top-0 left-10 lg:w-72 lg:h-72"></div>
+            <div class="absolute w-56 h-56 bg-slate-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 bottom-0 right-10 lg:w-72 lg:h-72"></div>
+
+            <div class="relative w-full max-w-md z-10 bg-slate-100/80 rounded-3xl p-6 shadow-2xl backdrop-blur-sm border border-white">
+                <img id="product-image" class="object-cover w-full h-64 lg:h-72 drop-shadow-2xl transition-all duration-500 hover:scale-105" src="" alt="Product photo">
+                
+
             </div>
         </div>
     </div>
