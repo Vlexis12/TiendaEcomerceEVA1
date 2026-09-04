@@ -1,335 +1,216 @@
- function getProducts() {
-            let products = localStorage.getItem('store_products');
-            if (!products) {
-                products = [
-                    { id: 1, name: 'Zapatillas Deportivas', price: 59.99, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400' },
-                    { id: 2, name: 'Reloj Inteligente', price: 129.99, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400' },
-                    { id: 3, name: 'Mochila Urbana', price: 45.00, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400' }
-                ];
-                localStorage.setItem('store_products', JSON.stringify(products));
-            }
-            return JSON.parse(products);
-        }
+const PRODUCTS_KEY = 'store_products';
+const CART_KEY = 'carrito';
 
-        function saveProducts(products) {
-            localStorage.setItem('store_products', JSON.stringify(products));
-        }
+const defaultProducts = [
+    { id: 1, name: 'Nike Air Force 1', price: 119990, image: 'img/zapatillas/af1.webp', description: 'El clásico blanco que funciona con todo.', previousPrice: 150000 },
+    { id: 2, name: 'Nike Jordan 1 Low', price: 129990, image: 'img/zapatillas/jordan1.webp', description: 'Perfil bajo, actitud alta y comodidad diaria.', previousPrice: 160000 },
+    { id: 3, name: 'Nike Book 2 Tigers', price: 115990, image: 'img/zapatillas/book21.webp', description: 'Rendimiento y estilo para dominar la cancha.', previousPrice: 180000 },
+    { id: 4, name: 'Nike Shox R4', price: 219990, image: 'img/zapatillas/NikeShoxR4.jpg', description: 'El balance justo entre retro y actual.', previousPrice: 320000 },
+    { id: 5, name: 'Jordan Retro 11', price: 219990, image: 'img/zapatillas/retro11.jpg', description: 'El balance justo entre retro y actual.', previousPrice: 320000 },
+    { id: 6, name: 'Jordan Retro 6', price: 219990, image: 'img/zapatillas/retro6.jpg', description: 'El balance justo entre retro y actual.', previousPrice: 320000 },
+    { id: 7, name: 'Jordan Retro 3', price: 219990, image: 'img/zapatillas/retro3.webp', description: 'El balance justo entre retro y actual.', previousPrice: 320000 },
+    { id: 8, name: 'Jordan Retro 5', price: 219990, image: 'img/zapatillas/retro5.png', description: 'El balance justo entre retro y actual.', previousPrice: 320000 }
+]
+function toClpValue(value) {
+    const amount = Number(value || 0);
+    return amount > 0 && amount < 1000 ? Math.round(amount * 1000) : amount;
+}
 
-        function renderTable() {
-            const products = getProducts();
-            const tbody = document.getElementById('product-table-body');
-            tbody.innerHTML = '';
+function formatCLP(value) {
+    return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(toClpValue(value));
+}
 
-            if (products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No hay productos registrados.</td></tr>`;
-                return;
-            }
+function normalizeProduct(product) {
+    const name = product.name || product.nombre || 'Zapatilla StepHouse';
+    const price = toClpValue(product.price ?? product.precioActual);
+    const image = product.image || product.imagen || 'img/zapatillas/af1.webp';
+    return {
+        id: Number(product.id),
+        name,
+        price,
+        image,
+        description: product.description || product.descripcion || 'Zapatilla seleccionada por StepHouse.',
+        previousPrice: toClpValue(product.previousPrice || product.precioAnterior?.replace(/[^0-9.]/g, '') || price)
+    };
+}
 
-            products.forEach(p => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td class="p-4"><img src="${p.image}" class="w-12 h-12 object-cover rounded-md" alt="${p.name}"></td>
-                        <td class="p-4 font-medium">${p.name}</td>
-                        <td class="p-4">$${Number(p.price).toFixed(2)}</td>
-                        <td class="p-4 text-center space-x-2">
-                            <button onclick="editProduct(${p.id})" class="px-3 py-1 bg-amber-500 text-white rounded hover:bg-amber-600 text-sm">Editar</button>
-                            <button onclick="deleteProduct(${p.id})" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Eliminar</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        // Crear o Actualizar Producto
-        document.getElementById('product-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = document.getElementById('product-id').value;
-            const name = document.getElementById('name').value;
-            const price = parseFloat(document.getElementById('price').value);
-            const image = document.getElementById('image').value;
-
-            let products = getProducts();
-
-            if (id) {
-                // Editar
-                products = products.map(p => p.id == id ? { id: Number(id), name, price, image } : p);
-            } else {
-                // Crear nuevo
-                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-                products.push({ id: newId, name, price, image });
-            }
-
-            saveProducts(products);
-            renderTable();
-            resetForm();
-        });
-
-        function editProduct(id) {
-            const products = getProducts();
-            const p = products.find(prod => prod.id == id);
-            if (p) {
-                document.getElementById('product-id').value = p.id;
-                document.getElementById('name').value = p.name;
-                document.getElementById('price').value = p.price;
-                document.getElementById('image').value = p.image;
-                document.getElementById('form-title').innerText = 'Editar Producto';
-                document.getElementById('btn-save').innerText = 'Actualizar';
-                document.getElementById('btn-cancel').classList.remove('hidden');
-            }
-        }
-
-        function deleteProduct(id) {
-            if (confirm('¿Estás seguro de eliminar este producto? Se borrará automáticamente del catálogo de la tienda.')) {
-                let products = getProducts();
-                products = products.filter(p => p.id !== id);
-                saveProducts(products);
-                renderTable();
-            }
-        }
-
-        function resetForm() {
-            document.getElementById('product-form').reset();
-            document.getElementById('product-id').value = '';
-            document.getElementById('form-title').innerText = 'Agregar Nuevo Producto';
-            document.getElementById('btn-save').innerText = 'Guardar';
-            document.getElementById('btn-cancel').classList.add('hidden');
-        }
-
-        renderTable();
-document.addEventListener('DOMContentLoaded', () => {
-  const productos = [
-    { id: 1, nombre: "Urban Red Kicks", precioActual: 119.99, precioAnterior: "$150.00", descripcion: "Zapatillas urbanas de alto impacto con suela de aire.", imagen: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=1160" },
-    { id: 2, nombre: "Classic Canvas High-Top", precioActual: 59.99, precioAnterior: "$75.00", descripcion: "El diseño clásico de lona que nunca pasa de moda.", imagen: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&q=80&w=1160" },
-    { id: 3, nombre: "Pro Runner White", precioActual: 129.99, precioAnterior: "$160.00", descripcion: "Diseñadas para corredores exigentes.", imagen: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&q=80&w=1160" },
-    { id: 4, nombre: "Street Skate V2", precioActual: 65.00, precioAnterior: "$85.00", descripcion: "Agarre superior para la tabla de skate.", imagen: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&q=80&w=1160" },
-    { id: 5, nombre: "Retro Basketball 80s", precioActual: 145.00, precioAnterior: "$180.00", descripcion: "Inspiradas en las canchas de los años 80.", imagen: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=1160" },
-    { id: 6, nombre: "Trail Explorer", precioActual: 95.99, precioAnterior: "$130.00", descripcion: "Tracción todoterreno para tus aventuras.", imagen: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&q=80&w=1160" }
-  ];
-
-
-  let carritoItems = JSON.parse(localStorage.getItem('carrito')) || [];
-
-  const guardarCarrito = () => {
-    localStorage.setItem('carrito', JSON.stringify(carritoItems));
-  };
-
-
-  const contenedorGrid = document.getElementById('grid-productos'); 
-  const listaCarritoPagina = document.getElementById('lista-carrito-pagina'); 
-  
-  const btnCarrito = document.getElementById('btn-carrito');
-  const modalCarrito = document.getElementById('carrito');
-  const btnCerrarCarrito = document.getElementById('cerrar-carrito');
-  const btnContinuarComprando = document.getElementById('continuar-comprando');
-  const listaCarrito = document.getElementById('lista-carrito');
-  const textCantidadCarrito = document.getElementById('cantidad-carrito-total');
-  
-  // NUEVO: Burbuja roja de cantidad sobre el botón
-  const badgeCarrito = document.getElementById('contador-carrito');
-
-
-  const renderizarProductos = () => {
-    if (!contenedorGrid) return; 
-
-    contenedorGrid.innerHTML = ''; 
-    const fragment = document.createDocumentFragment();
-
-    productos.forEach(producto => {
-      const div = document.createElement('div');
-      div.className = "group relative flex flex-col h-full overflow-hidden bg-white rounded shadow-sm border border-gray-100"; 
-      
-      div.innerHTML = `
-        <img src="${producto.imagen}" alt="${producto.nombre}" class="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72" />
-        
-        <div class="relative flex flex-col flex-1 bg-white p-6">
-          <p class="text-gray-700">
-            $${producto.precioActual}
-            <span class="text-gray-600 line-through text-sm ml-2">${producto.precioAnterior}</span>
-          </p>
-          <h3 class="mt-1.5 text-lg font-medium text-gray-900">${producto.nombre}</h3>
-          <p class="mt-1.5 line-clamp-3 text-gray-700">${producto.descripcion}</p>
-          
-          <div class="mt-auto pt-4 flex gap-4">
-            <button type="button" data-id="${producto.id}" class="btn-agregar block w-full rounded-sm bg-gray-100 px-4 py-3 text-sm font-medium text-gray-900 transition hover:scale-105">
-              Añadir al carrito
-            </button>
-          </div>
-        </div>
-      `;
-      fragment.appendChild(div);
-    });
-
-    contenedorGrid.appendChild(fragment);
-
-    const botonesAgregar = document.querySelectorAll('.btn-agregar');
-    botonesAgregar.forEach(boton => boton.addEventListener('click', agregarAlCarrito));
-  };
-
-
-  const agregarAlCarrito = (e) => {
-    const idProducto = parseInt(e.target.dataset.id);
-    const productoSeleccionado = productos.find(p => p.id === idProducto);
-    const existe = carritoItems.find(item => item.id === idProducto);
-
-    if (existe) {
-      existe.cantidad++;
-    } else {
-      carritoItems.push({ ...productoSeleccionado, cantidad: 1 });
+function getProducts() {
+    const stored = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || 'null');
+    if (!Array.isArray(stored) || stored.length === 0) {
+        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(defaultProducts));
+        return defaultProducts.map(normalizeProduct);
     }
-
-    guardarCarrito(); 
-    actualizarVistas(); 
-    
-    if (modalCarrito) modalCarrito.classList.remove('hidden');
-  };
-
-  const eliminarDelCarrito = (id) => {
-    carritoItems = carritoItems.filter(item => item.id !== id);
-    guardarCarrito(); 
-    actualizarVistas(); 
-  };
-
-  const actualizarInsigniaCarrito = () => {
-    if (!badgeCarrito) return;
-    const totalItems = carritoItems.reduce((total, item) => total + item.cantidad, 0);
-    if (totalItems > 0) {
-      badgeCarrito.innerText = totalItems;
-      badgeCarrito.classList.remove('hidden');
-    } else {
-      badgeCarrito.classList.add('hidden');
+    const currentProducts = stored.map(normalizeProduct);
+    const existingNames = new Set(currentProducts.map(product => product.name.toLowerCase()));
+    const missingFeatured = defaultProducts.filter(product => !existingNames.has(product.name.toLowerCase()));
+    if (missingFeatured.length) {
+        const mergedProducts = [...currentProducts, ...missingFeatured.map(normalizeProduct)];
+        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(mergedProducts));
+        return mergedProducts;
     }
-  };
+    return currentProducts;
+}
 
-  const actualizarVistas = () => {
-    if (listaCarrito) renderizarCarritoLateral();
-    if (listaCarritoPagina) renderizarCarritoPagina();
-    actualizarInsigniaCarrito(); // <-- NUEVO
-  };
+function saveProducts(products) {
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products.map(normalizeProduct)));
+}
 
-  const renderizarCarritoLateral = () => {
-    if (!listaCarrito) return;
-    listaCarrito.innerHTML = '';
-    let totalCantidad = 0;
+function resolveProductImage(image) {
+    return window.location.pathname.includes('/admin/') && image.startsWith('img/') ? `../${image}` : image;
+}
 
-    carritoItems.forEach(item => {
-      totalCantidad += item.cantidad;
-      const li = document.createElement('li');
-      li.className = "flex items-center gap-4";
-      li.innerHTML = `
-        <img src="${item.imagen}" alt="${item.nombre}" class="size-16 rounded-sm object-cover" />
-        <div class="flex-1">
-          <h3 class="text-sm text-gray-900">${item.nombre}</h3>
-          <dl class="mt-0.5 space-y-px text-[10px] text-gray-600">
-            <div><dt class="inline">Precio:</dt> <dd class="inline">$${item.precioActual}</dd></div>
-          </dl>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-700 bg-white border border-gray-300 rounded px-2 py-1">Qty: ${item.cantidad}</span>
-          <button type="button" class="btn-eliminar text-gray-600 hover:text-red-600" data-id="${item.id}">
-            <span class="sr-only">Eliminar</span>
-            <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      `;
-      listaCarrito.appendChild(li);
-    });
+function getCart() {
+    const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+    return Array.isArray(cart) ? cart : [];
+}
 
-    if(textCantidadCarrito) textCantidadCarrito.innerText = `(${totalCantidad})`;
+function saveCart(cart) {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
 
-    const botonesEliminar = document.querySelectorAll('#lista-carrito .btn-eliminar');
-    botonesEliminar.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.closest('button').dataset.id;
-        eliminarDelCarrito(parseInt(id));
-      });
-    });
-  };
-
-  const renderizarCarritoPagina = () => {
-    if (!listaCarritoPagina) return; 
-    listaCarritoPagina.innerHTML = '';
-    let subtotal = 0;
-
-    if (carritoItems.length === 0) {
-      listaCarritoPagina.innerHTML = '<p class="text-gray-500 text-center py-4">Tu carrito está vacío.</p>';
-      
-      // Asegurarse de que los subtotales se actualicen a 0 cuando el carrito esté vacío
-      const subEl = document.getElementById('resumen-subtotal');
-      const ivaEl = document.getElementById('resumen-iva');
-      const totEl = document.getElementById('resumen-total');
-      if(subEl) subEl.innerText = `$0.00`;
-      if(ivaEl) ivaEl.innerText = `$0.00`;
-      if(totEl) totEl.innerText = `$0.00`;
-      return; // Detiene la función
+function renderAdminTable() {
+    const tableBody = document.getElementById('product-table-body');
+    if (!tableBody) return;
+    const products = getProducts();
+    tableBody.innerHTML = '';
+    if (!products.length) {
+        tableBody.innerHTML = '<tr><td colspan="4" class="px-5 py-12 text-center text-sm text-slate-500">No hay zapatillas registradas.</td></tr>';
+        return;
     }
-
-    carritoItems.forEach(item => {
-      subtotal += (item.precioActual * item.cantidad);
-      const li = document.createElement('li');
-      li.className = "flex items-center gap-4";
-      li.innerHTML = `
-        <img src="${item.imagen}" alt="${item.nombre}" class="size-16 rounded-sm object-cover" />
-        <div>
-          <h3 class="text-sm text-gray-900">${item.nombre}</h3>
-          <dl class="mt-0.5 space-y-px text-[10px] text-gray-600">
-            <div><dt class="inline">Precio:</dt> <dd class="inline">$${item.precioActual}</dd></div>
-          </dl>
-        </div>
-        <div class="flex flex-1 items-center justify-end gap-2">
-          <span class="text-xs text-gray-700 bg-white border border-gray-300 rounded px-2 py-1">Cant: ${item.cantidad}</span>
-          <button class="text-gray-600 transition hover:text-red-600 btn-eliminar-pagina" data-id="${item.id}">
-            <span class="sr-only">Remove item</span>
-            <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-            </svg>
-          </button>
-        </div>
-      `;
-      listaCarritoPagina.appendChild(li);
+    products.forEach(product => {
+        tableBody.innerHTML += `<tr class="transition hover:bg-slate-50"><td class="px-5 py-4"><img src="${resolveProductImage(product.image)}" class="h-14 w-14 rounded-xl object-cover" alt="${product.name}"></td><td class="px-5 py-4 font-semibold">${product.name}</td><td class="px-5 py-4">${formatCLP(product.price)}</td><td class="px-5 py-4 text-right"><button type="button" onclick="editProduct(${product.id})" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">Editar</button><button type="button" onclick="deleteProduct(${product.id})" class="rounded-lg px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50">Eliminar</button></td></tr>`;
     });
+}
 
-    const subEl = document.getElementById('resumen-subtotal');
-    const ivaEl = document.getElementById('resumen-iva');
-    const totEl = document.getElementById('resumen-total');
+function getProductForm() {
+    return document.getElementById('product-form');
+}
 
-    if (subEl) subEl.innerText = `$${subtotal.toFixed(2)}`;
-    
+function isSneakerName(name) {
+    return /zapatilla|nike|air|jordan|runner|sneaker|sport|street|basket|court|force/i.test(name);
+}
+
+function setupAdmin() {
+    const form = getProductForm();
+    if (!form) return;
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        const id = document.getElementById('product-id').value;
+        const name = document.getElementById('name').value.trim();
+        const price = Number.parseInt(document.getElementById('price').value, 10);
+        const image = document.getElementById('image').value.trim();
+        if (!isSneakerName(name)) {
+            alert('Solo puedes ingresar zapatillas. Incluye una marca o modelo de zapatilla en el nombre.');
+            return;
+        }
+        if (!Number.isFinite(price) || price <= 0) {
+            alert('Ingresa un precio válido para la zapatilla.');
+            return;
+        }
+        const products = getProducts();
+        const product = normalizeProduct({ id: id ? Number(id) : Date.now(), name, price, image });
+        saveProducts(id ? products.map(item => item.id === Number(id) ? product : item) : [...products, product]);
+        renderAdminTable();
+        window.resetForm();
+    });
+    renderAdminTable();
+}
+
+window.editProduct = function (id) {
+    const product = getProducts().find(item => item.id === Number(id));
+    if (!product) return;
+    document.getElementById('product-id').value = product.id;
+    document.getElementById('name').value = product.name;
+    document.getElementById('price').value = product.price;
+    document.getElementById('image').value = product.image;
+    document.getElementById('form-title').textContent = 'Editar zapatilla';
+    document.getElementById('btn-save').textContent = 'Actualizar';
+    document.getElementById('btn-cancel').classList.remove('hidden');
+};
+
+window.deleteProduct = function (id) {
+    if (!confirm('¿Eliminar esta zapatilla del catálogo?')) return;
+    saveProducts(getProducts().filter(product => product.id !== Number(id)));
+    renderAdminTable();
+};
+
+window.resetForm = function () {
+    const form = getProductForm();
+    if (!form) return;
+    form.reset();
+    document.getElementById('product-id').value = '';
+    document.getElementById('form-title').textContent = 'Agregar Nueva Zapatilla';
+    document.getElementById('btn-save').textContent = 'Guardar';
+    document.getElementById('btn-cancel').classList.add('hidden');
+};
+
+function renderStorefront() {
+    const grid = document.getElementById('grid-productos');
+    if (!grid) return;
+    const products = getProducts();
+    grid.innerHTML = products.map(product => `<article class="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg"><div class="h-72 overflow-hidden bg-slate-100"><img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105"></div><div class="flex flex-1 flex-col p-5"><p class="text-xs uppercase tracking-wider text-slate-400">Zapatilla StepHouse</p><h2 class="mt-2 text-lg font-bold">${product.name}</h2><p class="mt-2 flex-1 text-sm leading-6 text-slate-500">${product.description}</p><div class="mt-5 flex items-center justify-between"><div><span class="font-bold">${formatCLP(product.price)}</span><span class="ml-2 text-sm text-slate-400 line-through">${formatCLP(product.previousPrice)}</span></div><button type="button" data-id="${product.id}" class="btn-agregar rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">Añadir</button></div></div></article>`).join('');
+    grid.querySelectorAll('.btn-agregar').forEach(button => button.addEventListener('click', event => addToCart(Number(event.currentTarget.dataset.id))));
+}
+
+function updateCartBadge() {
+    const badge = document.getElementById('contador-carrito');
+    if (!badge) return;
+    const total = getCart().reduce((sum, item) => sum + Number(item.cantidad || 0), 0);
+    badge.textContent = total;
+    badge.classList.toggle('hidden', total === 0);
+}
+
+function addToCart(id) {
+    const product = getProducts().find(item => item.id === id);
+    if (!product) return;
+    const cart = getCart();
+    const existing = cart.find(item => item.id === id);
+    if (existing) existing.cantidad += 1;
+    else cart.push({ ...product, cantidad: 1 });
+    saveCart(cart);
+    renderCartViews();
+    document.getElementById('carrito')?.classList.remove('hidden');
+}
+
+function removeFromCart(id) {
+    saveCart(getCart().filter(item => item.id !== id));
+    renderCartViews();
+}
+
+function cartItemMarkup(item, page) {
+    const removeClass = page ? 'btn-eliminar-pagina' : 'btn-eliminar';
+    return `<li class="flex items-center gap-4 py-4"><img src="${item.image || item.imagen}" alt="${item.name || item.nombre}" class="h-16 w-16 rounded-xl object-cover"><div class="min-w-0 flex-1"><h3 class="truncate text-sm font-semibold">${item.name || item.nombre}</h3><p class="mt-1 text-xs text-slate-500">${formatCLP(item.price ?? item.precioActual)} · Cantidad: ${item.cantidad}</p></div><button type="button" class="${removeClass} rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900" data-id="${item.id}" aria-label="Eliminar ${item.name || item.nombre}">×</button></li>`;
+}
+
+function renderCartViews() {
+    const cart = getCart();
+    const sideList = document.getElementById('lista-carrito');
+    const pageList = document.getElementById('lista-carrito-pagina');
+    if (sideList) sideList.innerHTML = cart.length ? cart.map(item => cartItemMarkup(item, false)).join('') : '<li class="py-8 text-center text-sm text-slate-500">Tu carrito está vacío.</li>';
+    if (pageList) pageList.innerHTML = cart.length ? cart.map(item => cartItemMarkup(item, true)).join('') : '<li class="py-12 text-center text-sm text-slate-500">Tu carrito está vacío. Explora el catálogo para comenzar.</li>';
+    document.querySelectorAll('.btn-eliminar, .btn-eliminar-pagina').forEach(button => button.addEventListener('click', () => removeFromCart(Number(button.dataset.id))));
+    const subtotal = cart.reduce((sum, item) => sum + Number(item.price ?? item.precioActual) * Number(item.cantidad), 0);
     const iva = subtotal * 0.19;
-    if (ivaEl) ivaEl.innerText = `$${iva.toFixed(2)}`;
-    
-    const total = subtotal + iva;
-    if (totEl) totEl.innerText = `$${total.toFixed(2)}`;
+    document.getElementById('resumen-subtotal')?.replaceChildren(formatCLP(subtotal));
+    document.getElementById('resumen-iva')?.replaceChildren(formatCLP(iva));
+    document.getElementById('resumen-total')?.replaceChildren(formatCLP(subtotal + iva));
+    const count = cart.reduce((sum, item) => sum + Number(item.cantidad), 0);
+    const totalLabel = document.getElementById('cantidad-carrito-total');
+    if (totalLabel) totalLabel.textContent = `(${count})`;
+    updateCartBadge();
+}
 
-    const botonesEliminarPagina = document.querySelectorAll('.btn-eliminar-pagina');
-    botonesEliminarPagina.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.closest('button').dataset.id;
-        eliminarDelCarrito(parseInt(id));
-      });
-    });
-  };
+function setupCartPanel() {
+    const panel = document.getElementById('carrito');
+    const toggle = () => panel?.classList.toggle('hidden');
+    document.getElementById('btn-carrito')?.addEventListener('click', toggle);
+    document.getElementById('cerrar-carrito')?.addEventListener('click', toggle);
+    document.getElementById('continuar-comprando')?.addEventListener('click', toggle);
+}
 
-  const toggleCarrito = () => {
-    if(modalCarrito) modalCarrito.classList.toggle('hidden');
-  };
-
-  if(btnCarrito) btnCarrito.addEventListener('click', toggleCarrito);
-  if(btnCerrarCarrito) btnCerrarCarrito.addEventListener('click', toggleCarrito);
-  if(btnContinuarComprando) btnContinuarComprando.addEventListener('click', toggleCarrito);
-
-  document.addEventListener('click', (event) => {
-    if(modalCarrito && btnCarrito) {
-      const isClickInsideCarrito = modalCarrito.contains(event.target);
-      const isClickOnBoton = btnCarrito.contains(event.target);
-      
-      if (!isClickInsideCarrito && !isClickOnBoton && !modalCarrito.classList.contains('hidden')) {
-        modalCarrito.classList.add('hidden');
-      }
-    }
-  });
-
-  renderizarProductos(); 
-  actualizarVistas();    
+document.addEventListener('DOMContentLoaded', () => {
+    setupAdmin();
+    renderStorefront();
+    setupCartPanel();
+    renderCartViews();
 });

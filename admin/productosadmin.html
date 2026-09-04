@@ -3,94 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Productos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Productos | SneakerX Admin</title>
+    <script src="https://cdn.tailwindcss.com">
+</script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 flex h-screen overflow-hidden">
-
-    <aside class="flex flex-col w-64 h-screen px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
-        <a href="#" class="mx-auto">
-            <img class="w-auto h-6 sm:h-7" src="https://merakiui.com/images/full-logo.svg" alt="">
-        </a>
-
-        <div class="flex flex-col items-center mt-6 -mx-2">
-            <img class="object-cover w-24 h-24 mx-2 rounded-full" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="avatar">
-            <h4 class="mx-2 mt-2 font-medium text-gray-800 dark:text-gray-200">John Doe</h4>
-            <p class="mx-2 mt-1 text-sm font-medium text-gray-600 dark:text-gray-400">john@example.com</p>
-        </div>
-
-        <div class="flex flex-col justify-between flex-1 mt-6">
-            <nav>
-                <a href="home.html" class="flex items-center px-4 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <span class="mx-4 font-medium">Dashboard</span>
-                </a>
-
-                <a href="usuarios.html" class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <span class="mx-4 font-medium">Usuarios</span>
-                </a>
-
-                <a href="productosadmin.html" class="flex items-center px-4 py-2 mt-5 text-gray-700 bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-gray-200">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M15 5V7M15 11V13M15 17V19M5 5C3.89543 5 3 5.89543 3 7V10C4.10457 10 5 10.8954 5 12C5 13.1046 4.10457 14 3 14V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V14C19.8954 14 19 13.1046 19 12C19 10.8954 19.8954 10 21 10V7C21 5.89543 20.1046 5 19 5H5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <span class="mx-4 font-medium">Productos</span>
-                </a>
-            </nav>
-        </div>
+<body class="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
+<div class="flex min-h-screen flex-col lg:flex-row">
+    <aside class="flex w-full flex-col bg-[#111827] px-5 py-6 text-white lg:min-h-screen lg:w-72">
+        <a href="home.html" class="flex items-center gap-3 px-3">
+<span class="grid h-10 w-10 place-items-center rounded-xl bg-white text-lg font-black text-[#111827]">S</span>
+<span>
+<strong class="block text-lg tracking-tight">SneakerX</strong>
+<small class="text-xs text-slate-400">ADMINISTRADOR</small>
+</span>
+</a>
+        <div class="mt-10 rounded-2xl border border-white/10 bg-white/5 p-4">
+<div class="flex items-center gap-3">
+<div class="grid h-11 w-11 place-items-center rounded-full bg-white font-bold text-[#111827]">AR</div>
+<div>
+<p class="font-semibold">Alexis Rozas</p>
+<p class="text-xs text-slate-400">Administrador</p>
+</div>
+</div>
+<p class="mt-3 truncate text-xs text-slate-400">alexis.rozas@adminshop.cl</p>
+</div>
+        <nav class="mt-8 space-y-2" aria-label="Navegación principal">
+<a href="home.html" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">
+<span aria-hidden="true">▦</span> Dashboard</a>
+<a href="usuarios.html" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">
+<span aria-hidden="true">♙</span> Usuarios</a>
+<a href="productosadmin.html" class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[#111827]">
+<span aria-hidden="true">◇</span> Productos</a>
+</nav>
+        <a href="../index.html" class="mt-auto hidden items-center gap-3 px-4 py-3 text-sm text-slate-400 transition hover:text-white lg:flex">← Volver a la tienda</a>
     </aside>
-
-    <main class="flex-1 p-8 overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Gestión de Productos</h1>
-            <a href="../productos.html" target="_blank" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Ver Catálogo de la Tienda ➔</a>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md mb-8">
-            <h2 id="form-title" class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">Agregar Nuevo Producto</h2>
-            <form id="product-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <input type="hidden" id="product-id">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Nombre</label>
-                    <input type="text" id="name" required class="w-full mt-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Precio ($)</label>
-                    <input type="number" id="price" step="0.01" required class="w-full mt-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">URL de Imagen</label>
-                    <input type="url" id="image" placeholder="https://..." required class="w-full mt-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
-                <div class="flex items-end gap-2">
-                    <button type="submit" id="btn-save" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Guardar</button>
-                    <button type="button" id="btn-cancel" onclick="resetForm()" class="hidden w-1/3 bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-500 transition">Cancelar</button>
-                </div>
-            </form>
-        </div>
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm uppercase">
-                    <tr>
-                        <th class="p-4">Imagen</th>
-                        <th class="p-4">Nombre</th>
-                        <th class="p-4">Precio</th>
-                        <th class="p-4 text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="product-table-body" class="divide-y divide-gray-200 dark:divide-gray-700 text-gray-700 dark:text-gray-300">
-
-                </tbody>
-            </table>
+    <main class="flex-1 overflow-y-auto">
+<header class="border-b border-slate-200 bg-white px-6 py-6 lg:px-10">
+<p class="text-sm font-medium text-slate-500">Panel de control / Catálogo</p>
+<div class="mt-1 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+<div>
+<h1 class="text-3xl font-bold tracking-tight">Productos</h1>
+<p class="mt-2 text-sm text-slate-500">Mantén actualizado el catálogo de zapatillas de SneakerX.</p>
+</div>
+<a href="../productos.html" target="_blank" class="inline-flex w-fit items-center gap-2 rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Ver tienda <span aria-hidden="true">
+</span>
+</a>
+</div>
+</header>
+        <div class="px-6 py-8 lg:px-10">
+<section class="mb-6 grid gap-4 sm:grid-cols-3">
+<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+<p class="text-sm text-slate-500">Catálogo</p>
+<p class="mt-2 text-xl font-bold">Inventario activo</p>
+<p class="mt-1 text-xs text-slate-500">Sincronizado con la tienda</p>
+</div>
+<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+<p class="text-sm text-slate-500">Acciones disponibles</p>
+<p class="mt-2 text-xl font-bold">Crear · Editar · Eliminar</p>
+<p class="mt-1 text-xs text-slate-500">Cambios guardados localmente</p>
+</div>
+<div class="rounded-2xl border border-slate-200 bg-slate-900 p-5 text-white shadow-sm">
+<p class="text-sm text-slate-400">Estado</p>
+<p class="mt-2 text-xl font-bold">Tienda activa</p>
+<p class="mt-1 text-xs text-slate-400">Lista para publicar novedades</p>
+</div>
+</section>
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+<div class="mb-6 flex items-start gap-4">
+<span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-xl text-slate-800">+</span>
+<div>
+<h2 id="form-title" class="text-xl font-bold">Agregar Nueva Zapatilla</h2>
+<p class="mt-1 text-sm text-slate-500">Añade modelos Nike o zapatillas deportivas al catálogo.</p>
+</div>
+</div>
+<form id="product-form" class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+<input type="hidden" id="product-id">
+<div>
+<label for="name" class="mb-2 block text-sm font-semibold text-slate-700">Nombre de la zapatilla</label>
+<input type="text" id="name" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="Ej. Nike Air Max 90">
+</div>
+<div>
+<label for="price" class="mb-2 block text-sm font-semibold text-slate-700">Precio (CLP)</label>
+<input type="number" id="price" min="1" step="1" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="119990">
+</div>
+<div>
+<label for="image" class="mb-2 block text-sm font-semibold text-slate-700">Imagen de la zapatilla</label>
+<input type="url" id="image" placeholder="URL de imagen Nike o del modelo" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+</div>
+<div class="flex items-end gap-2">
+<button type="submit" id="btn-save" class="w-full rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Guardar</button>
+<button type="button" id="btn-cancel" onclick="resetForm()" class="hidden w-1/3 rounded-xl bg-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-300">Cancelar</button>
+</div>
+</form>
+</section>
+            <section class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+<div class="flex flex-col gap-2 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+<div>
+<h2 class="font-bold">Catálogo publicado</h2>
+<p class="mt-1 text-sm text-slate-500">Administra los productos visibles para tus clientes.</p>
+</div>
+<span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Actualización instantánea</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full min-w-[700px] text-left">
+<thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+<tr>
+<th class="px-5 py-4">Imagen</th>
+<th class="px-5 py-4">Producto</th>
+<th class="px-5 py-4">Precio</th>
+<th class="px-5 py-4 text-right">Acciones</th>
+</tr>
+</thead>
+<tbody id="product-table-body" class="divide-y divide-slate-100 text-slate-700">
+</tbody>
+</table>
+</div>
+</section>
         </div>
     </main>
-
-    <script src="../js/productos.js" defer></script>
+</div>
+<script src="../js/productos.js" defer>
+</script>
 </body>
 </html>
