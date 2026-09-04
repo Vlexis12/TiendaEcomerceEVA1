@@ -3,175 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nosotros - SneakerX</title>
+    <title>Nosotros | SneakerX</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
-    <style>
-        /* CSS del interruptor animado (Modo Oscuro) */
-        .ui-switch {
-            --switch-bg: rgb(135, 150, 165);
-            --switch-width: 48px;
-            --switch-height: 20px;
-            --circle-diameter: 32px;
-            --circle-bg: rgb(0, 56, 146);
-            --circle-inset: calc((var(--circle-diameter) - var(--switch-height)) / 2);
-        }
-        .ui-switch input { display: none; }
-        .slider {
-            -webkit-appearance: none; appearance: none;
-            width: var(--switch-width); height: var(--switch-height);
-            background: var(--switch-bg); border-radius: 999px;
-            position: relative; cursor: pointer;
-        }
-        .slider .circle {
-            top: calc(var(--circle-inset) * -1); left: 0;
-            width: var(--circle-diameter); height: var(--circle-diameter);
-            position: absolute; background: var(--circle-bg); border-radius: inherit;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjAiIHdpZHRoPSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj4KICAgIDxwYXRoIGZpbGw9IiNmZmYiCiAgICAgICAgZD0iTTkuMzA1IDEuNjY3VjMuNzVoMS4zODlWMS42NjdoLTEuMzl6bS00LjcwNyAxLjk1bC0uOTgyLjk4Mkw1LjA5IDYuMDcybC45ODItLjk4Mi0xLjQ3My0xLjQ3M3ptMTAuODAyIDBMMTMuOTI3IDUuMDlsLjk4Mi45ODIgMS40NzMtMS40NzMtLjk4Mi0uOTgyek0xMCA1LjEzOWE0Ljg3MiA0Ljg3MiAwIDAwLTQuODYyIDQuODZBNC44NzIgNC44NzIgMCAwMDEwIDE0Ljg2MiA0Ljg3MiA0Ljg3MiAwIDAwMTQuODYgMTAgNC44NzIgNC44NzIgMCAwMDEwIDUuMTM5em0wIDEuMzg5QTMuNDYyIDMuNDYyIDAgMDExMy40NzEgMTBhMy40NjIgMy40NjIgMCAwMS0zLjQ3MyAzLjQ3MkEzLjQ2MiAzLjQ2MiAwIDAxNi41MjcgMTAgMy40NjIgMy40NjIgMCAwMTEwIDYuNTI4ek0xLjY2NSA5LjMwNXYxLjM5aDIuMDgzdi0xLjM5SDEuNjY2em0xNC41ODMgMHYxLjM5aDIuMDg0di0xLjM5aC0yLjA4NHpNNS4wOSAxMy45MjhMMy42MTYgMTUuNGwuOTgyLjk4MiAxLjQ3My0xLjQ3My0uOTgyLS45ODJ6bTkuODIgMGwtLjk4Mi45ODIgMS40NzMgMS40NzMuOTgyLS45ODItMS40NzMtMS40NzN6TTkuMzA1IDE2LjI1djIuMDgzaDEuMzg5VjE2LjI1aC0xLjM5eiIgLz4KPC9zdmc+");
-            background-repeat: no-repeat; background-position: center center;
-            transition: left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
-        }
-        .slider .circle::before {
-            content: ""; position: absolute; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.75); border-radius: inherit;
-            transition: all 500ms; opacity: 0;
-        }
-        .ui-switch input:checked+.slider .circle {
-            left: calc(100% - var(--circle-diameter));
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjAiIHdpZHRoPSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj4KICAgIDxwYXRoIGZpbGw9IiNmZmYiCiAgICAgICAgZD0iTTQuMiAyLjVsLS43IDEuOC0xLjguNyAxLjguNy43IDEuOC42LTEuOEw2LjcgNWwtMS45LS43LS42LTEuOHptMTUgOC4zYTYuNyA2LjcgMCAxMS02LjYtNi42IDUuOCA1LjggMCAwMDYuNiA2LjZ6IiAvPgo8L3N2Zz4=");
-        }
-        .ui-switch input:active+.slider .circle::before { transition: 0s; opacity: 1; width: 0; height: 0; }
-    </style>
 </head>
-<body class="transition-colors duration-300 bg-white dark:bg-black dark:text-gray-100 font-sans">
-
-    <header class="border-b border-gray-200 dark:border-gray-800">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2 text-2xl font-black tracking-tighter uppercase">
-                <span class="text-red-600">Sneaker</span>X
-            </div>
-            <nav class="hidden md:flex gap-8 font-semibold text-sm tracking-widest uppercase">
-                <a href="index.html" class="hover:text-red-500 transition-colors">Inicio</a>
-                <a href="#" class="text-red-600">Nosotros</a>
-                <a href="productos.html" class="hover:text-red-500 transition-colors">Mercado</a>
-            </nav>
-            <a href="registro.html" class="px-6 py-2 text-sm font-bold text-white uppercase transition-all duration-300 bg-red-600 rounded hover:bg-red-500 shadow-[0_0_10px_rgba(220,38,38,0.5)]">
-                Regístrate
+<body class="bg-[#f3f4f6] text-slate-900 antialiased">
+    <header class="border-b border-slate-200 bg-white">
+        <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
+            <a href="index.html" class="flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-[#111827] text-lg font-black text-white">S</span>
+                <span>
+                    <strong class="block text-lg tracking-tight">SneakerX</strong>
+                    <small class="block text-[10px] font-semibold tracking-[0.22em] text-slate-400">Movimiento Diferente</small>
+                </span>
             </a>
-        </div>
+            <div class="hidden items-center gap-8 text-sm font-medium text-slate-500 md:flex">
+                <a href="index.html" class="transition hover:text-slate-900">Inicio</a>
+                <a href="productos.html" class="transition hover:text-slate-900">Catálogo</a>
+                <a href="nosotros.html" class="border-b-2 border-[#111827] pb-1 text-slate-900">Nosotros</a>
+            </div>
+            <a href="productos.html" class="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">Explorar catálogo</a>
+        </nav>
     </header>
 
-    <section class="container mx-auto px-6 py-16 md:py-24">
-        <h1 class="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none mb-8">
-            Pisa Fuerte. <br><span class="text-red-600">Destaca.</span>
-        </h1>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-            <div class="md:col-span-2 h-96 bg-gray-200 dark:bg-gray-900 rounded-lg overflow-hidden bg-cover bg-center" style="background-image: url('img/yeezy2.jpg');">
-                </div>
-            <div class="bg-black-100 dark:bg-black-900 p-8 flex flex-col justify-center rounded-lg border-l-4 border-red-600">
-                <h2 class="text-2xl font-bold uppercase mb-4">Para los Verdaderos Sneakerheads</h2>
-                <p class="text-gray-600 dark:text-gray-400">
-                    Compra y vende zapatillas con la tranquilidad de un mercado transparente. Garantizamos que cada par que pasa por nuestras manos es 100% auténtico gracias a nuestro equipo de expertos.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <section class="border-y border-gray-200 dark:border-gray-800">
-        <div class="container mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-black-200 dark:divide-black-800">
-                <div class="p-12">
-                    <h3 class="text-3xl font-black uppercase mb-4">Autenticidad<br>Garantizada</h3>
-                    <p class="text-black-600 dark:text-black-400">
-                        Creemos en crear un entorno seguro donde puedas tradear libremente. Cada zapatilla es inspeccionada rigurosamente para garantizar que recibes exactamente lo que compras.
-                    </p>
-                </div>
-                <div class="p-12 bg-black-50 dark:bg-black-900">
-                    <h3 class="text-3xl font-black uppercase mb-4">Mercado Libre<br>Dinámico</h3>
-                    <p class="text-black-600 dark:text-black-400">
-                        Nuestra plataforma ofrece datos del mercado en tiempo real, pujas y demandas transparentes para que siempre pagues o vendas al precio justo.
-                    </p>
-                </div>
-                <div class="h-64 md:h-auto bg-cover bg-center" style="background-image: url('img/jordan4.jpg');">
-                    </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="container mx-auto px-6 py-20">
-        <h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-12">Únete a la <span class="text-red-600">Cultura</span></h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-gray-200 dark:border-gray-800 pt-8">
-            <div class="flex flex-col gap-10">
+    <main>
+        <section class="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+            <div class="grid items-center gap-10 lg:grid-cols-[1fr_1.2fr]">
                 <div>
-                    <h4 class="text-2xl font-bold uppercase mb-2">Descubre tu Estilo</h4>
-                    <p class="text-gray-600 dark:text-gray-400">Explora miles de modelos, desde clásicos atemporales hasta colaboraciones exclusivas.</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Nuestra forma de ver el movimiento</p>
+                    <h1 class="mt-4 text-5xl font-bold tracking-tight sm:text-7xl">Pisa fuerte.<br>Muévete distinto.</h1>
+                    <p class="mt-6 max-w-lg text-lg leading-8 text-slate-500">SneakerX nace para acercar zapatillas con personalidad a quienes convierten cada paso en parte de su estilo.</p>
                 </div>
-                <div class="border-t border-gray-200 dark:border-gray-800 pt-10">
-                    <h4 class="text-2xl font-bold uppercase mb-2">Datos Transparentes</h4>
-                    <p class="text-gray-600 dark:text-gray-400">Toma decisiones informadas. Te mostramos el historial de ventas y volatilidad del precio.</p>
-                </div>
-                <div class="border-t border-gray-200 dark:border-gray-800 pt-10">
-                    <h4 class="text-2xl font-bold uppercase mb-2">Una Comunidad Global</h4>
-                    <p class="text-gray-600 dark:text-gray-400">Compra y vende con coleccionistas de todo el mundo sin preocuparte por la logística.</p>
-                </div>
+                <div class="h-[380px] rounded-3xl bg-cover bg-center shadow-sm lg:h-[460px]" style="background-image: url('img/yeezy2.jpg');"></div>
             </div>
-            
-            <div class="bg-gray-200 dark:bg-gray-900 rounded-lg min-h-[400px] bg-cover bg-center" style="background-image: url('img/campus.jpg');">
-                </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="bg-red-600 text-white text-center py-24 px-6">
-        <p class="text-sm font-bold uppercase tracking-widest mb-4 opacity-80">En lo que creemos</p>
-        <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-8">
-            ¡Comienza a Tradear Hoy Mismo!
-        </h2>
-        <a href="registro.html" class="inline-block px-10 py-4 bg-white text-black font-black uppercase text-lg rounded hover:bg-gray-200 transition-colors shadow-lg">
-            Empieza Ahora
-        </a>
-    </section>
+        <section class="border-y border-slate-200 bg-white">
+            <div class="mx-auto grid max-w-7xl gap-0 px-6 lg:grid-cols-3 lg:px-8">
+                <article class="border-b border-slate-200 py-10 lg:border-b-0 lg:border-r lg:pr-10">
+                    <p class="text-3xl font-bold">01</p>
+                    <h2 class="mt-6 text-xl font-bold">Selección con criterio</h2>
+                    <p class="mt-3 leading-7 text-slate-500">Elegimos modelos que combinan diseño, comodidad y una historia que vale la pena llevar.</p>
+                </article>
+                <article class="border-b border-slate-200 py-10 lg:border-b-0 lg:border-r lg:px-10">
+                    <p class="text-3xl font-bold">02</p>
+                    <h2 class="mt-6 text-xl font-bold">Compra simple</h2>
+                    <p class="mt-3 leading-7 text-slate-500">Una experiencia clara para encontrar tu próximo par sin perderte entre el ruido.</p>
+                </article>
+                <article class="py-10 lg:pl-10">
+                    <p class="text-3xl font-bold">03</p>
+                    <h2 class="mt-6 text-xl font-bold">Comunidad en movimiento</h2>
+                    <p class="mt-3 leading-7 text-slate-500">Construimos un espacio para descubrir tendencias y compartir la cultura sneaker.</p>
+                </article>
+            </div>
+        </section>
 
-    <footer class="container mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-200 dark:border-gray-800 mt-12">
-        <div>
-            <div class="text-3xl font-black tracking-tighter uppercase mb-2">
-                <span class="text-red-600">Sneaker</span>X
-            </div>
-            <p class="text-gray-500 text-sm">El mercado definitivo de cultura urbana.</p>
-        </div>
-        <div class="grid grid-cols-2 gap-4 text-sm">
+        <section class="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24">
+            <div class="h-80 rounded-3xl bg-cover bg-center" style="background-image: url('img/jordan4.jpg');"></div>
             <div>
-                <h5 class="font-bold uppercase mb-2">Contacto</h5>
-                <p class="text-gray-500">soporte@sneakerx.com</p>
-                <p class="text-gray-500">+56 9 1234 5678</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">El siguiente paso</p>
+                <h2 class="mt-3 text-4xl font-bold tracking-tight">Tu estilo no se queda quieto.</h2>
+                <p class="mt-5 leading-8 text-slate-500">Explora nuestra selección y encuentra el par que encaja contigo, desde clásicos esenciales hasta nuevas siluetas.</p>
+                <a href="productos.html" class="mt-7 inline-flex rounded-xl bg-[#111827] px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Ver catálogo →</a>
             </div>
-            <div>
-                <h5 class="font-bold uppercase mb-2">Soporte</h5>
-                <p class="text-gray-500">Lunes a Viernes: 9:00 - 18:00</p>
-                <p class="text-gray-500">Fin de semana: Cerrado</p>
-            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#111827] px-6 py-8 text-slate-400 lg:px-8">
+        <div class="mx-auto flex max-w-7xl justify-between text-sm">
+            <p>© 2026 SneakerX.</p>
+            <a href="index.html" class="transition hover:text-white">Volver al inicio</a>
         </div>
     </footer>
-
-    <div class="fixed z-50 bottom-6 right-6 drop-shadow-lg">
-        <label class="ui-switch">
-            <input type="checkbox" onchange="toggleDarkMode()">
-            <div class="slider">
-                <div class="circle"></div>
-            </div>
-        </label>
-    </div>
-
-    <script>
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-        }
-    </script>
 </body>
 </html>

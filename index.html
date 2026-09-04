@@ -1,82 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>SneakerX | Zapatillas que marcan el paso</title>
+    <script src="https://cdn.tailwindcss.com">
+</script>
 </head>
-<body>
-<header class="bg-gray-50 min-h-screen">
-    <!-- Navbar -->
-    <nav class="bg-transparent pt-6">
-        <div class="container flex flex-col items-center justify-between p-6 mx-auto md:flex-row">
-            
-            <a href="#" class="mx-auto md:mx-0">
-                <img class="w-auto h-6 sm:h-7" src="https://merakiui.com/images/full-logo.svg" alt="Logo Merakiui">
+<body class="bg-[#f3f4f6] text-slate-900 antialiased">
+    <header class="bg-white">
+        <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8" aria-label="Navegación principal">
+            <a href="index.html" class="flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-[#111827] text-lg font-black text-white">S</span>
+                <span>
+<strong class="block text-lg tracking-tight">SneakerX</strong>
+<small class="block text-[10px] font-semibold tracking-[0.22em] text-slate-400">Movimiento Diferente</small>
+</span>
             </a>
-
-            <div class="flex items-center justify-center mt-6 text-sm font-medium text-slate-600 capitalize md:mt-0">
-                <a href="index.html" class="mx-2 text-slate-900 border-b-2 border-blue-500 pb-1 sm:mx-4">Home</a>
-                <a href="productos.html" class="mx-2 border-b-2 border-transparent pb-1 hover:text-slate-900 hover:border-blue-500 sm:mx-4">Productos</a>
-                <a href="#" class="mx-2 border-b-2 border-transparent pb-1 hover:text-slate-900 hover:border-blue-500 sm:mx-4">Pricing</a>
-                <a href="#" class="mx-2 border-b-2 border-transparent pb-1 hover:text-slate-900 hover:border-blue-500 sm:mx-4">Blog</a>
-                
-                <a href="#" class="mx-2 border-b-2 border-transparent pb-1 hover:text-slate-900 sm:mx-4">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M1 11.9554V12.0446C1.01066 14.7301 1.98363 17.1885 3.59196 19.0931C4.05715 19.6439 4.57549 20.1485 5.13908 20.5987C5.70631 21.0519 6.31937 21.4501 6.97019 21.7853C7.90271 22.2656 8.91275 22.6165 9.97659 22.8143C10.5914 22.9286 11.2243 22.9918 11.8705 22.9993C11.9136 22.9998 11.9567 23 11.9999 23C15.6894 23 18.9547 21.1836 20.9502 18.3962C21.3681 17.8125 21.7303 17.1861 22.0291 16.525C22.6528 15.1448 22.9999 13.613 22.9999 12C22.9999 8.73978 21.5816 5.81084 19.3283 3.79653C18.8064 3.32998 18.2397 2.91249 17.6355 2.55132C15.9873 1.56615 14.0597 1 11.9999 1C11.888 1 11.7764 1.00167 11.6653 1.00499C9.99846 1.05479 8.42477 1.47541 7.0239 2.18719C6.07085 2.67144 5.19779 3.29045 4.42982 4.01914C3.7166 4.69587 3.09401 5.4672 2.58216 6.31302C2.22108 6.90969 1.91511 7.54343 1.6713 8.20718C1.24184 9.37631 1.00523 10.6386 1 11.9554ZM20.4812 15.0186C20.8171 14.075 20.9999 13.0588 20.9999 12C20.9999 9.54265 20.0151 7.31533 18.4186 5.6912C17.5975 7.05399 16.5148 8.18424 15.2668 9.0469C15.7351 10.2626 15.9886 11.5603 16.0045 12.8778C16.7692 13.0484 17.5274 13.304 18.2669 13.6488C19.0741 14.0252 19.8141 14.487 20.4812 15.0186ZM15.8413 14.8954C16.3752 15.0321 16.904 15.22 17.4217 15.4614C18.222 15.8346 18.9417 16.3105 19.5723 16.8661C18.0688 19.2008 15.5151 20.7953 12.5788 20.9817C13.5517 20.0585 14.3709 18.9405 14.972 17.6514C15.3909 16.7531 15.678 15.8272 15.8413 14.8954ZM13.9964 12.6219C13.9583 11.7382 13.7898 10.8684 13.5013 10.0408C10.6887 11.2998 7.36584 11.3765 4.35382 9.97197C4.01251 9.81281 3.68319 9.63837 3.36632 9.44983C3.12787 10.2584 2.99991 11.1142 2.99991 12C2.99991 13.9462 3.61763 15.748 4.6677 17.2203C6.83038 14.1875 10.3685 12.4987 13.9964 12.6219ZM6.047 18.7502C7.77258 16.059 10.7714 14.5382 13.8585 14.6191C13.723 15.3586 13.4919 16.093 13.1594 16.8062C12.3777 18.4825 11.1453 19.805 9.67385 20.6965C8.31043 20.3328 7.07441 19.6569 6.047 18.7502ZM11.9999 3C13.7846 3 15.4479 3.51946 16.847 4.41543C16.2113 5.54838 15.3593 6.4961 14.368 7.23057C13.3472 5.57072 11.8752 4.16433 10.027 3.21692C10.6619 3.07492 11.3222 3 11.9999 3ZM8.80619 4.84582C10.4462 5.61056 11.7474 6.80659 12.6379 8.23588C10.3464 9.24654 7.64722 9.30095 5.19906 8.15936C4.83384 7.98905 4.48541 7.79735 4.15458 7.58645C4.91365 6.24006 6.00929 5.10867 7.32734 4.30645C7.82672 4.44058 8.32138 4.61975 8.80619 4.84582Z" fill="currentColor" /></svg>
-                </a>
-                
-                <a href="#" class="mx-2 border-b-2 border-transparent pb-1 hover:text-slate-900 sm:mx-4">
-                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m.75 19h7.092c4.552 0 6.131-6.037 2.107-8.203 2.701-2.354 1.029-6.797-2.595-6.797h-6.604c-.414 0-.75.336-.75.75v13.5c0 .414.336.75.75.75zm.75-13.5h5.854c3.211 0 3.215 4.768 0 4.768h-5.854zm0 6.268h6.342c3.861 0 3.861 5.732 0 5.732h-6.342z"/><path d="m18.374 7.857c-3.259 0-5.755 2.888-5.635 5.159-.247 3.28 2.397 5.984 5.635 5.984 2.012 0 3.888-1.065 4.895-2.781.503-.857-.791-1.613-1.293-.76-.739 1.259-2.12 2.041-3.602 2.041-2.187 0-3.965-1.668-4.125-3.771 1.443.017 4.136-.188 8.987-.033.016 0 .027-.008.042-.008 2-.09-.189-5.831-4.904-5.831zm-3.928 4.298c1.286-3.789 6.718-3.676 7.89.064-4.064.097-6.496-.066-7.89-.064z"/><path d="m21.308 6.464c.993 0 .992-1.5 0-1.5h-5.87c-.993 0-.992 1.5 0 1.5z"/></svg>
-                </a>
+            <div class="hidden items-center gap-8 text-sm font-medium text-slate-500 md:flex">
+                <a href="index.html" class="border-b-2 border-[#111827] pb-1 text-slate-900">Inicio</a>
+                <a href="productos.html" class="transition hover:text-slate-900">Catálogo</a>
+                <a href="nosotros.html" class="transition hover:text-slate-900">Nosotros</a>
             </div>
-
-            <div class="hidden md:block">
-                <a href="login.html" class="px-5 py-2 text-sm font-semibold tracking-wider text-blue-600 transition-colors border-2 border-blue-600 rounded-lg hover:bg-blue-600 hover:text-white">
-                    Login
-                </a>
+            <div class="flex items-center gap-3">
+                <a href="login.html" class="hidden rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900 sm:inline-flex">Ingresar</a>
+                <a href="productos.html" class="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">Comprar ahora</a>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-  
-    <div class="container flex flex-col px-6 pt-10 pb-16 mx-auto space-y-8 lg:pt-12 lg:pb-24 lg:flex-row lg:items-center">
-        
-      
-        <div class="flex flex-row items-center w-full lg:w-1/2">
-            
-      
-            <div id="product-dots" class="flex flex-col justify-center pr-8 space-y-4">
-                <!-- Se inyectan aquí -->
-            </div>
-
-            <!-- Textos -->
-            <div class="max-w-lg">
-                <h1 id="product-title" class="text-3xl font-bold tracking-wide text-slate-800 lg:text-5xl transition-opacity duration-300">
-                   
-                </h1>
-                <p id="product-desc" class="mt-6 text-sm text-slate-500 leading-relaxed transition-opacity duration-300">
-             
-                </p>
-                  <div class="mt-8">
-                      <a id="product-btn" href="productos.html" class="px-6 py-3 text-sm font-semibold tracking-wide text-white capitalize bg-[#2A65F3] rounded-lg shadow-md hover:bg-blue-600 focus:outline-none">
-                          Ver Productos
-                      </a>
-                  </div>
+    <main>
+        <section class="relative overflow-hidden bg-[#111827]" aria-label="Colección destacada">
+            <div class="relative h-[430px] sm:h-[500px] lg:h-[540px]">
+                <div class="absolute inset-0 bg-black/35">
+</div>
+                <img id="product-image" src="" alt="Zapatilla destacada" class="absolute inset-0 h-full w-full object-cover opacity-100 transition-opacity duration-500 ease-in-out">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/25 to-transparent">
+</div>
+                <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-6 lg:px-8">
+                    <div class="max-w-xl text-white">
+                        <p class="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">Nueva selección / 2026</p>
+                        <h1 id="product-title" class="text-4xl font-bold tracking-tight sm:text-6xl">Colección SneakerX</h1>
+                        <p id="product-desc" class="mt-5 max-w-lg text-sm leading-7 text-slate-200 sm:text-base">
+</p>
+                        <div class="mt-8 flex flex-wrap items-center gap-4">
+                            <a id="product-btn" href="productos.html" class="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#111827] transition hover:bg-slate-200">Ver colección</a>
+                            <div id="product-dots" class="flex items-center gap-3" aria-label="Cambiar colección">
+</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-  
-        <div class="flex items-center justify-center w-full mt-10 lg:w-1/2 lg:mt-0">
-            <div class="relative w-full max-w-2xl h-80 lg:h-[28rem]">
-                <div class="absolute inset-0 bg-gray-200 rounded-xl shadow-inner mix-blend-multiply"></div>
-                <img id="product-image" class="object-cover w-full h-full rounded-xl shadow-lg transition-opacity duration-500 ease-in-out opacity-100" src="" alt="Product photo">
+        <section class="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20" aria-labelledby="bestsellers-title">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                <div>
+<p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Lo que todos están usando</p>
+<h2 id="bestsellers-title" class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Más vendidas</h2>
+</div>
+                <a href="productos.html" class="text-sm font-semibold text-slate-600 transition hover:text-black">Ver todo el catálogo <span aria-hidden="true">→</span>
+</a>
+            </div>
+            <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <a href="productos.html" class="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg">
+<div class="h-64 overflow-hidden bg-slate-100">
+<img src="img/zapatillas/af1.webp" alt="Nike Air Force 1" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+</div>
+<div class="p-5">
+<p class="text-xs uppercase tracking-wider text-slate-400">SneakerX pick</p>
+<h3 class="mt-2 font-bold">Nike Air Force 1</h3>
+<p class="mt-1 text-sm text-slate-500">Clásico, limpio, siempre vigente.</p>
+</div>
+</a>
+                <a href="productos.html" class="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg">
+<div class="h-64 overflow-hidden bg-slate-100">
+<img src="img/zapatillas/jordan1.webp" alt="Jordan 1 Low" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+</div>
+<div class="p-5">
+<p class="text-xs uppercase tracking-wider text-slate-400">Street essential</p>
+<h3 class="mt-2 font-bold">Jordan 1 Low</h3>
+<p class="mt-1 text-sm text-slate-500">Una silueta que combina con todo.</p>
+</div>
+</a>
+                <a href="productos.html" class="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg">
+<div class="h-64 overflow-hidden bg-slate-100">
+<img src="img/zapatillas/book21.webp" alt="Book 2 Tigers" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+</div>
+<div class="p-5">
+<p class="text-xs uppercase tracking-wider text-slate-400">Performance</p>
+<h3 class="mt-2 font-bold">Book 2 Tigers</h3>
+<p class="mt-1 text-sm text-slate-500">Diseñadas para moverte sin límites.</p>
+</div>
+</a>
+                <a href="productos.html" class="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg">
+<div class="h-64 overflow-hidden bg-slate-100">
+<img src="img/zapatillas/NikeShoxR4.jpg" alt="Nike Shox R4" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+</div>
+<div class="p-5">
+<p class="text-xs uppercase tracking-wider text-slate-400">New arrival</p>
+<h3 class="mt-2 font-bold">Nike Shox R4</h3>
+<p class="mt-1 text-sm text-slate-500">El balance justo entre retro y actual.</p>
+</div>
+</a>
+            </div>
+        </section>
+
+        <section class="border-y border-slate-200 bg-white">
+            <div class="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1fr_1.3fr] lg:items-center lg:px-8 lg:py-20">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Tu próximo par está aquí</p>
+                    <h2 class="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Encuentra tu forma de moverte.</h2>
+                    <p class="mt-4 max-w-md leading-7 text-slate-500">Explora una selección curada de zapatillas para la calle, la cancha y todos los días.</p>
+                    <a href="productos.html" class="mt-7 inline-flex rounded-xl bg-[#111827] px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Explorar catálogo <span class="ml-2" aria-hidden="true">→</span></a>
+                </div>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div class="flex h-36 items-end rounded-2xl bg-[#111827] p-4 text-white sm:h-44"><span class="text-sm font-semibold">Streetwear</span></div>
+                    <div class="flex h-36 items-end rounded-2xl bg-slate-200 p-4 text-slate-900 sm:h-44"><span class="text-sm font-semibold">Running</span></div>
+                    <div class="col-span-2 flex h-36 items-end rounded-2xl bg-slate-100 p-4 text-slate-900 sm:col-span-1 sm:h-44"><span class="text-sm font-semibold">Basketball</span></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#111827] px-6 py-8 text-slate-400 lg:px-8">
+        <div class="mx-auto flex max-w-7xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+            <p>© 2026 SneakerX. Hecho para moverte.</p>
+            <div class="flex gap-5">
+                <a href="nosotros.html" class="transition hover:text-white">Nosotros</a>
+                <a href="productos.html" class="transition hover:text-white">Catálogo</a>
+                <a href="login.html" class="transition hover:text-white">Ingresar</a>
             </div>
         </div>
-    </div>
-</header>
-
-<script src="js/index.js"></script>
+    </footer>
+    <script src="js/index.js">
+</script>
 </body>
 </html>

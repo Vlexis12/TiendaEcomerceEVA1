@@ -1,155 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Registro | SneakerX</title>
+    <script src="https://cdn.tailwindcss.com">
+</script>
 </head>
-<body>
-    <script src="https://cdn.tailwindcss.com"></script>
-<script>
-    tailwind.config = {
-        darkMode: 'class',
-    }
-</script>
-
-<style>
-.ui-switch {
-  --switch-bg: rgb(135, 150, 165);
-  --switch-width: 48px;
-  --switch-height: 20px;
-  --circle-diameter: 32px;
-  --circle-bg: rgb(0, 56, 146);
-  --circle-inset: calc((var(--circle-diameter) - var(--switch-height)) / 2);
-}
-
-.ui-switch input {
-  display: none;
-}
-
-.slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: var(--switch-width);
-  height: var(--switch-height);
-  background: var(--switch-bg);
-  border-radius: 999px;
-  position: relative;
-  cursor: pointer;
-}
-
-.slider .circle {
-  top: calc(var(--circle-inset) * -1);
-  left: 0;
-  width: var(--circle-diameter);
-  height: var(--circle-diameter);
-  position: absolute;
-  background: var(--circle-bg);
-  border-radius: inherit;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjAiIHdpZHRoPSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj4KICAgIDxwYXRoIGZpbGw9IiNmZmYiCiAgICAgICAgZD0iTTkuMzA1IDEuNjY3VjMuNzVoMS4zODlWMS42NjdoLTEuMzl6bS00LjcwNyAxLjk1bC0uOTgyLjk4Mkw1LjA5IDYuMDcybC45ODItLjk4Mi0xLjQ3My0xLjQ3M3ptMTAuODAyIDBMMTMuOTI3IDUuMDlsLjk4Mi45ODIgMS40NzMtMS40NzMtLjk4Mi0uOTgyek0xMCA1LjEzOWE0Ljg3MiA0Ljg3MiAwIDAwLTQuODYyIDQuODZBNC44NzIgNC44NzIgMCAwMDEwIDE0Ljg2MiA0Ljg3MiA0Ljg3MiAwIDAwMTQuODYgMTAgNC44NzIgNC44NzIgMCAwMDEwIDUuMTM5em0wIDEuMzg5QTMuNDYyIDMuNDYyIDAgMDExMy40NzEgMTBhMy40NjIgMy40NjIgMCAwMS0zLjQ3MyAzLjQ3MkEzLjQ2MiAzLjQ2MiAwIDAxNi41MjcgMTAgMy40NjIgMy40NjIgMCAwMTEwIDYuNTI4ek0xLjY2NSA5LjMwNXYxLjM5aDIuMDgzdi0xLjM5SDEuNjY2em0xNC41ODMgMHYxLjM5aDIuMDg0di0xLjM5aC0yLjA4NHpNNS4wOSAxMy45MjhMMy42MTYgMTUuNGwuOTgyLjk4MiAxLjQ3My0xLjQ3My0uOTgyLS45ODJ6bTkuODIgMGwtLjk4Mi45ODIgMS40NzMgMS40NzMuOTgyLS45ODItMS40NzMtMS40NzN6TTkuMzA1IDE2LjI1djIuMDgzaDEuMzg5VjE2LjI1aC0xLjM5eiIgLz4KPC9zdmc+");
-  background-repeat: no-repeat;
-  background-position: center center;
-  transition: left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
-}
-
-.slider .circle::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.75);
-  border-radius: inherit;
-  transition: all 500ms;
-  opacity: 0;
-}
-
-.ui-switch input:checked+.slider .circle {
-  left: calc(100% - var(--circle-diameter));
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjAiIHdpZHRoPSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj4KICAgIDxwYXRoIGZpbGw9IiNmZmYiCiAgICAgICAgZD0iTTQuMiAyLjVsLS43IDEuOC0xLjguNyAxLjguNy43IDEuOC42LTEuOEw2LjcgNWwtMS45LS43LS42LTEuOHptMTUgOC4zYTYuNyA2LjcgMCAxMS02LjYtNi42IDUuOCA1LjggMCAwMDYuNiA2LjZ6IiAvPgo8L3N2Zz4=");
-}
-
-.ui-switch input:active+.slider .circle::before {
-  transition: 0s;
-  opacity: 1;
-  width: 0;
-  height: 0;
-}
-</style>
-
-<section class="relative overflow-hidden transition-colors duration-300 bg-white dark:bg-black">
-    <div class="flex justify-center min-h-screen">
-        <div class="hidden bg-cover lg:block lg:w-2/5" style="background-image: url('img/fondo_registro_2.png')"></div>
-        <div class="flex items-center w-full max-w-3xl p-8 mx-auto lg:px-12 lg:w-3/5">
-            <div class="w-full">
-                
-                <h1 class="text-2xl font-semibold tracking-wider text-gray-800 capitalize dark:text-white">
-                    ¡Bienvenido!, inicia sesion en SneakerX.
-                </h1>
-
-                <p class="mt-4 text-gray-500 dark:text-gray-400">
-                    Inicia sesion con tu cuenta de SneakerX o crea una nueva cuenta para comenzar a comprar y vender zapatillas de manera segura y confiable.
-                </p>
-
-                <form class="grid grid-cols-1 gap-6 mt-8 md:grid-cols-2">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Primer Nombre</label>
-                        <input type="text" placeholder="Nombre" class="block w-full px-5 py-3 mt-2 text-gray-700 transition-shadow duration-300 bg-white border border-black rounded-lg placeholder-gray-400 dark:bg-black dark:border-gray-700 dark:text-gray-300 dark:placeholder-gray-600 shadow-[0_4px_10px_rgba(0,0,0,0.15)] focus:border-red-500 focus:ring-red-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Apellido</label>
-                        <input type="text" placeholder="Apellido" class="block w-full px-5 py-3 mt-2 text-gray-700 transition-shadow duration-300 bg-white border border-black rounded-lg placeholder-gray-400 dark:bg-black dark:border-gray-700 dark:text-gray-300 dark:placeholder-gray-600 shadow-[0_4px_10px_rgba(0,0,0,0.15)] focus:border-red-500 focus:ring-red-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Numero de Telefono</label>
-                        <input type="text" placeholder="+569xxxxxxxx" class="block w-full px-5 py-3 mt-2 text-gray-700 transition-shadow duration-300 bg-white border border-black rounded-lg placeholder-gray-400 dark:bg-black dark:border-gray-700 dark:text-gray-300 dark:placeholder-gray-600 shadow-[0_4px_10px_rgba(0,0,0,0.15)] focus:border-red-500 focus:ring-red-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Email</label>
-                        <input type="email" placeholder="nombreusario@example.com" class="block w-full px-5 py-3 mt-2 text-gray-700 transition-shadow duration-300 bg-white border border-black rounded-lg placeholder-gray-400 dark:bg-black dark:border-gray-700 dark:text-gray-300 dark:placeholder-gray-600 shadow-[0_4px_10px_rgba(0,0,0,0.15)] focus:border-red-500 focus:ring-red-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Contraseña</label>
-                        <input type="password" placeholder="Escribe tu Contraseña" class="block w-full px-5 py-3 mt-2 text-gray-700 transition-shadow duration-300 bg-white border border-black rounded-lg placeholder-gray-400 dark:bg-black dark:border-gray-700 dark:text-gray-300 dark:placeholder-gray-600 shadow-[0_4px_10px_rgba(0,0,0,0.15)] focus:border-red-500 focus:ring-red-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Confirmar Contraseña</label>
-                        <input type="password" placeholder="Confirma tu Contraseña" class="block w-full px-5 py-3 mt-2 text-gray-700 transition-shadow duration-300 bg-white border border-black rounded-lg placeholder-gray-400 dark:bg-black dark:border-gray-700 dark:text-gray-300 dark:placeholder-gray-600 shadow-[0_4px_10px_rgba(0,0,0,0.15)] focus:border-red-500 focus:ring-red-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-                    </div>
-
-                    <button type="button" class="flex items-center justify-between w-full px-6 py-3 text-sm tracking-wide text-white capitalize transition-all duration-300 transform bg-red-600 rounded-md hover:bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.6)] hover:shadow-[0_0_25px_rgba(239,68,68,1)] focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50">
-                        <span>Iniciar Sesion</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <div class="fixed z-50 bottom-6 right-6 drop-shadow-lg">
-        <label class="ui-switch">
-            <input type="checkbox" onchange="toggleDarkMode()">
-            <div class="slider">
-                <div class="circle"></div>
-            </div>
-        </label>
-    </div>
+<body class="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
+<header class="border-b border-slate-200 bg-white">
+<nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
+<a href="index.html" class="flex items-center gap-3">
+<span class="grid h-10 w-10 place-items-center rounded-xl bg-[#111827] text-lg font-black text-white">S</span>
+<span>
+<strong class="block text-lg tracking-tight">SneakerX</strong>
+<small class="block text-[10px] font-semibold tracking-[0.22em] text-slate-400">MOVE DIFFERENT</small>
+</span>
+</a>
+<a href="login.html" class="text-sm font-semibold text-slate-600 transition hover:text-slate-900">Ya tengo una cuenta →</a>
+</nav>
+</header>
+<main class="mx-auto grid min-h-[calc(100vh-86px)] max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-[.85fr_1.15fr] lg:px-8">
+<div class="hidden min-h-[620px] rounded-3xl bg-cover bg-center lg:block" style="background-image: url('img/fondo_registro_2.png');">
+</div>
+<section class="mx-auto w-full max-w-2xl rounded-3xl bg-white p-7 shadow-sm ring-1 ring-slate-200 sm:p-10">
+<p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Únete a SneakerX</p>
+<h1 class="mt-3 text-4xl font-bold tracking-tight">Crea tu cuenta.</h1>
+<p class="mt-3 text-slate-500">Guarda tus favoritos y descubre nuevas formas de moverte.</p>
+<form class="mt-8 grid gap-5 sm:grid-cols-2">
+<label class="text-sm font-semibold text-slate-700">Nombre<input type="text" required placeholder="Alexis" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+</label>
+<label class="text-sm font-semibold text-slate-700">Apellido<input type="text" required placeholder="Rozas" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+</label>
+<label class="text-sm font-semibold text-slate-700">Teléfono<input type="tel" placeholder="+56 9 1234 5678" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+</label>
+<label class="text-sm font-semibold text-slate-700">Correo electrónico<input type="email" required placeholder="nombre@correo.com" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+</label>
+<label class="text-sm font-semibold text-slate-700">Contraseña<input type="password" required placeholder="Crea una contraseña" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+</label>
+<label class="text-sm font-semibold text-slate-700">Confirmar contraseña<input type="password" required placeholder="Repite tu contraseña" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+</label>
+<button type="submit" class="mt-2 flex items-center justify-center rounded-xl bg-[#111827] px-6 py-4 text-sm font-semibold text-white transition hover:bg-slate-700 sm:col-span-2">Crear mi cuenta <span class="ml-2" aria-hidden="true">→</span>
+</button>
+</form>
 </section>
-
-<script>
-    function toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
-    }
-</script>
+</main>
 </body>
 </html>
