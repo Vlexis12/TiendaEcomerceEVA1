@@ -27,23 +27,34 @@
 <p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Únete a SneakerX</p>
 <h1 class="mt-3 text-4xl font-bold tracking-tight">Crea tu cuenta.</h1>
 <p class="mt-3 text-slate-500">Guarda tus favoritos y descubre nuevas formas de moverte.</p>
-<form class="mt-8 grid gap-5 sm:grid-cols-2">
-<label class="text-sm font-semibold text-slate-700">Nombre<input type="text" required placeholder="Alexis" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
-</label>
-<label class="text-sm font-semibold text-slate-700">Apellido<input type="text" required placeholder="Rozas" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
-</label>
-<label class="text-sm font-semibold text-slate-700">Teléfono<input type="tel" placeholder="+56 9 1234 5678" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
-</label>
-<label class="text-sm font-semibold text-slate-700">Correo electrónico<input type="email" required placeholder="nombre@correo.com" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
-</label>
-<label class="text-sm font-semibold text-slate-700">Contraseña<input type="password" required placeholder="Crea una contraseña" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
-</label>
-<label class="text-sm font-semibold text-slate-700">Confirmar contraseña<input type="password" required placeholder="Repite tu contraseña" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
-</label>
-<button type="submit" class="mt-2 flex items-center justify-center rounded-xl bg-[#111827] px-6 py-4 text-sm font-semibold text-white transition hover:bg-slate-700 sm:col-span-2">Crear mi cuenta <span class="ml-2" aria-hidden="true">→</span>
-</button>
+<form id="registerForm" class="mt-8 grid gap-5 sm:grid-cols-2">
+    <label class="text-sm font-semibold text-slate-700">Nombre
+        <input type="text" id="regName" required placeholder="Jhon" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+    </label>
+    <label class="text-sm font-semibold text-slate-700">Apellido
+        <input type="text" id="regLastName" required placeholder="Die" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+    </label>
+    <label class="text-sm font-semibold text-slate-700">Teléfono
+        <input type="tel" id="regPhone" placeholder="+56 9 1234 5678" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+    </label>
+    <label class="text-sm font-semibold text-slate-700">Correo electrónico
+        <input type="email" id="regEmail" required placeholder="nombre@dominio.com" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+    </label>
+    <label class="text-sm font-semibold text-slate-700">Contraseña
+        <input type="password" id="regPassword" required placeholder="Crea una contraseña" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+    </label>
+    <label class="text-sm font-semibold text-slate-700">Confirmar contraseña
+        <input type="password" id="regConfirmPassword" required placeholder="Repite tu contraseña" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+    </label>
+    
+    <div id="regError" class="hidden text-sm font-semibold text-red-500 sm:col-span-2"></div>
+    
+    <button type="submit" class="mt-2 flex items-center justify-center rounded-xl bg-[#111827] px-6 py-4 text-sm font-semibold text-white transition hover:bg-slate-700 sm:col-span-2">
+        Crear mi cuenta <span class="ml-2" aria-hidden="true">→</span>
+    </button>
 </form>
 </section>
 </main>
+<script src="js/registro.js"></script>
 </body>
 </html>

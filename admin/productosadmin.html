@@ -4,125 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productos | SneakerX Admin</title>
-    <script src="https://cdn.tailwindcss.com">
-</script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
 <div class="flex min-h-screen flex-col lg:flex-row">
+    
+    <!-- Menú Lateral -->
     <aside class="flex w-full flex-col bg-[#111827] px-5 py-6 text-white lg:min-h-screen lg:w-72">
         <a href="home.html" class="flex items-center gap-3 px-3">
-<span class="grid h-10 w-10 place-items-center rounded-xl bg-white text-lg font-black text-[#111827]">S</span>
-<span>
-<strong class="block text-lg tracking-tight">SneakerX</strong>
-<small class="text-xs text-slate-400">ADMINISTRADOR</small>
-</span>
-</a>
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-white text-lg font-black text-[#111827]">S</span>
+            <span>
+                <strong class="block text-lg tracking-tight">SneakerX</strong>
+                <small class="text-xs text-slate-400">ADMINISTRADOR</small>
+            </span>
+        </a>
+        
+        <!-- Tarjeta de perfil de usuario logueado con IDs -->
         <div class="mt-10 rounded-2xl border border-white/10 bg-white/5 p-4">
-<div class="flex items-center gap-3">
-<div class="grid h-11 w-11 place-items-center rounded-full bg-white font-bold text-[#111827]">AR</div>
-<div>
-<p class="font-semibold">Alexis Rozas</p>
-<p class="text-xs text-slate-400">Administrador</p>
-</div>
-</div>
-<p class="mt-3 truncate text-xs text-slate-400">alexis.rozas@adminshop.cl</p>
-</div>
+            <div class="flex items-center gap-3">
+                <div id="admin-avatar" class="grid h-11 w-11 place-items-center rounded-full bg-white font-bold text-[#111827]">--</div>
+                <div>
+                    <p id="admin-nombre" class="font-semibold">Cargando...</p>
+                    <p class="text-xs text-slate-400">Administrador</p>
+                </div>
+            </div>
+            <p id="admin-email" class="mt-3 truncate text-xs text-slate-400">cargando@adminshop.cl</p>
+        </div>
+        
         <nav class="mt-8 space-y-2" aria-label="Navegación principal">
-<a href="home.html" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">
-<span aria-hidden="true">▦</span> Dashboard</a>
-<a href="usuarios.html" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">
-<span aria-hidden="true">♙</span> Usuarios</a>
-<a href="productosadmin.html" class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[#111827]">
-<span aria-hidden="true">◇</span> Productos</a>
-</nav>
+            <a href="home.html" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">
+                <span aria-hidden="true">▦</span> Dashboard
+            </a>
+            <a href="usuarios.html" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">
+                <span aria-hidden="true">♙</span> Usuarios
+            </a>
+            <a href="productosadmin.html" class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[#111827]">
+                <span aria-hidden="true">◇</span> Productos
+            </a>
+        </nav>
         <a href="../index.html" class="mt-auto hidden items-center gap-3 px-4 py-3 text-sm text-slate-400 transition hover:text-white lg:flex">← Volver a la tienda</a>
     </aside>
+
     <main class="flex-1 overflow-y-auto">
-<header class="border-b border-slate-200 bg-white px-6 py-6 lg:px-10">
-<p class="text-sm font-medium text-slate-500">Panel de control / Catálogo</p>
-<div class="mt-1 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-<div>
-<h1 class="text-3xl font-bold tracking-tight">Productos</h1>
-<p class="mt-2 text-sm text-slate-500">Mantén actualizado el catálogo de zapatillas de SneakerX.</p>
-</div>
-<a href="../productos.html" target="_blank" class="inline-flex w-fit items-center gap-2 rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Ver tienda <span aria-hidden="true">
-</span>
-</a>
-</div>
-</header>
+        <header class="border-b border-slate-200 bg-white px-6 py-6 lg:px-10">
+            <p class="text-sm font-medium text-slate-500">Panel de control / Catálogo</p>
+            <div class="mt-1 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight">Productos</h1>
+                    <p class="mt-2 text-sm text-slate-500">Mantén actualizado el catálogo de zapatillas de SneakerX.</p>
+                </div>
+                <a href="../index.html" target="_blank" class="inline-flex w-fit items-center gap-2 rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Ver tienda</a>
+            </div>
+        </header>
+
         <div class="px-6 py-8 lg:px-10">
-<section class="mb-6 grid gap-4 sm:grid-cols-3">
-<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-<p class="text-sm text-slate-500">Catálogo</p>
-<p class="mt-2 text-xl font-bold">Inventario activo</p>
-<p class="mt-1 text-xs text-slate-500">Sincronizado con la tienda</p>
-</div>
-<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-<p class="text-sm text-slate-500">Acciones disponibles</p>
-<p class="mt-2 text-xl font-bold">Crear · Editar · Eliminar</p>
-<p class="mt-1 text-xs text-slate-500">Cambios guardados localmente</p>
-</div>
-<div class="rounded-2xl border border-slate-200 bg-slate-900 p-5 text-white shadow-sm">
-<p class="text-sm text-slate-400">Estado</p>
-<p class="mt-2 text-xl font-bold">Tienda activa</p>
-<p class="mt-1 text-xs text-slate-400">Lista para publicar novedades</p>
-</div>
-</section>
+            <section class="mb-6 grid gap-4 sm:grid-cols-3">
+                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <p class="text-sm text-slate-500">Catálogo</p>
+                    <p class="mt-2 text-xl font-bold">Inventario activo</p>
+                    <p class="mt-1 text-xs text-slate-500">Sincronizado con la tienda</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <p class="text-sm text-slate-500">Acciones disponibles</p>
+                    <p class="mt-2 text-xl font-bold">Crear · Editar · Eliminar</p>
+                    <p class="mt-1 text-xs text-slate-500">Cambios guardados localmente</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-900 p-5 text-white shadow-sm">
+                    <p class="text-sm text-slate-400">Estado</p>
+                    <p class="mt-2 text-xl font-bold">Tienda activa</p>
+                    <p class="mt-1 text-xs text-slate-400">Lista para publicar novedades</p>
+                </div>
+            </section>
+
             <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-<div class="mb-6 flex items-start gap-4">
-<span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-xl text-slate-800">+</span>
-<div>
-<h2 id="form-title" class="text-xl font-bold">Agregar Nueva Zapatilla</h2>
-<p class="mt-1 text-sm text-slate-500">Añade modelos Nike o zapatillas deportivas al catálogo.</p>
-</div>
-</div>
-<form id="product-form" class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-<input type="hidden" id="product-id">
-<div>
-<label for="name" class="mb-2 block text-sm font-semibold text-slate-700">Nombre de la zapatilla</label>
-<input type="text" id="name" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="Ej. Nike Air Max 90">
-</div>
-<div>
-<label for="price" class="mb-2 block text-sm font-semibold text-slate-700">Precio (CLP)</label>
-<input type="number" id="price" min="1" step="1" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="119990">
-</div>
-<div>
-<label for="image" class="mb-2 block text-sm font-semibold text-slate-700">Imagen de la zapatilla</label>
-<input type="url" id="image" placeholder="URL de imagen Nike o del modelo" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
-</div>
-<div class="flex items-end gap-2">
-<button type="submit" id="btn-save" class="w-full rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Guardar</button>
-<button type="button" id="btn-cancel" onclick="resetForm()" class="hidden w-1/3 rounded-xl bg-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-300">Cancelar</button>
-</div>
-</form>
-</section>
+                <div class="mb-6 flex items-start gap-4">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-xl text-slate-800">+</span>
+                    <div>
+                        <h2 id="form-title" class="text-xl font-bold">Agregar Nueva Zapatilla</h2>
+                        <p class="mt-1 text-sm text-slate-500">Añade modelos Nike o zapatillas deportivas al catálogo.</p>
+                    </div>
+                </div>
+                <form id="product-form" class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                    <input type="hidden" id="product-id">
+                    <div>
+                        <label for="name" class="mb-2 block text-sm font-semibold text-slate-700">Nombre de la zapatilla</label>
+                        <input type="text" id="name" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="Ej. Nike Air Max 90">
+                    </div>
+                    <div>
+                        <label for="price" class="mb-2 block text-sm font-semibold text-slate-700">Precio (CLP)</label>
+                        <input type="number" id="price" min="1" step="1" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="119990">
+                    </div>
+                    <div>
+                        <label for="image" class="mb-2 block text-sm font-semibold text-slate-700">Imagen de la zapatilla</label>
+                        <input type="url" id="image" placeholder="URL de imagen Nike o del modelo" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button type="submit" id="btn-save" class="w-full rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Guardar</button>
+                        <button type="button" id="btn-cancel" onclick="resetForm()" class="hidden w-1/3 rounded-xl bg-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-300">Cancelar</button>
+                    </div>
+                </form>
+            </section>
+
             <section class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-<div class="flex flex-col gap-2 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
-<div>
-<h2 class="font-bold">Catálogo publicado</h2>
-<p class="mt-1 text-sm text-slate-500">Administra los productos visibles para tus clientes.</p>
-</div>
-<span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Actualización instantánea</span>
-</div>
-<div class="overflow-x-auto">
-<table class="w-full min-w-[700px] text-left">
-<thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
-<tr>
-<th class="px-5 py-4">Imagen</th>
-<th class="px-5 py-4">Producto</th>
-<th class="px-5 py-4">Precio</th>
-<th class="px-5 py-4 text-right">Acciones</th>
-</tr>
-</thead>
-<tbody id="product-table-body" class="divide-y divide-slate-100 text-slate-700">
-</tbody>
-</table>
-</div>
-</section>
+                <div class="flex flex-col gap-2 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="font-bold">Catálogo publicado</h2>
+                        <p class="mt-1 text-sm text-slate-500">Administra los productos visibles para tus clientes.</p>
+                    </div>
+                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Actualización instantánea</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[700px] text-left">
+                        <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                            <tr>
+                                <th class="px-5 py-4">Imagen</th>
+                                <th class="px-5 py-4">Producto</th>
+                                <th class="px-5 py-4">Precio</th>
+                                <th class="px-5 py-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-table-body" class="divide-y divide-slate-100 text-slate-700">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     </main>
 </div>
-<script src="../js/productos.js" defer>
-</script>
+<script src="../js/productos.js" defer></script>
 </body>
 </html>
