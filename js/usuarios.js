@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'store_users';
-const defaultUsers = [{ id: 1, name: 'Alexis Rozas', role: 'Administrador', email: 'alexis.rozas@adminshop.cl', password: 'admin123' }];
+const defaultUsers = [{ id: 1, name: 'Jhon Doe', role: 'Administrador', email: 'jhon.doe@adminshop.cl', password: 'admin123' }];
 let users = loadUsers();
 
 const tableBody = document.getElementById('usersTableBody');
@@ -60,6 +60,10 @@ function updateEmail() {
 window.openModal = function (id = null) {
     form.reset();
     userIdInput.value = '';
+    userRoleSelect.disabled = id === null;
+    userRoleSelect.classList.toggle('cursor-not-allowed', id === null);
+    userRoleSelect.classList.toggle('bg-slate-100', id === null);
+    userRoleSelect.value = 'Administrador';
     if (id !== null) {
         const user = users.find(item => item.id === id);
         if (!user) return;
@@ -111,6 +115,12 @@ form.addEventListener('submit', event => {
     if (id) users = users.map(item => item.id === id ? user : item);
     else users.push(user);
     saveUsers();
+    const activeSession = JSON.parse(localStorage.getItem('usuarioLogueado') || 'null');
+    if (activeSession?.email === user.email) {
+        activeSession.nombre = user.name;
+        activeSession.rol = user.role === 'Administrador' ? 'admin' : 'usuario';
+        localStorage.setItem('usuarioLogueado', JSON.stringify(activeSession));
+    }
     closeModal();
     renderTable();
 });
@@ -137,7 +147,7 @@ function cargarPerfilUsuario() {
         if (accesoActualEmail) accesoActualEmail.textContent = usuarioActivo.email;
         
     } else {
-        window.location.href = 'login.html';
+        window.location.href = '../login.html';
     }
 }
 

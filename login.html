@@ -3,73 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión | SneakerX</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Iniciar sesión | SneakerX</title>
+    <script src="https://cdn.tailwindcss.com">
+</script>
 </head>
-<body class="min-h-screen">
-    
-<section class="flex items-center justify-center min-h-screen bg-center bg-cover" style="background-image: url('img/fondo_registro_1.jpg');">
-    <div class="w-full max-w-5xl px-8 py-12 mx-4 bg-[#161925]/90 backdrop-blur-sm border border-gray-800 shadow-2xl rounded-2xl lg:px-16 lg:py-20 sm:mx-auto">
-        
-        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center">
-            
-            <div class="w-full mb-8 lg:w-1/2 flex flex-col items-start lg:mb-0">
-                <img class="w-auto h-15 mb-6" src="img/logo.png" alt="Logo">
-                <h2 class="text-gray-400 text-md">Bienvenido de nuevo</h2>
-                <h1 class="mt-2 text-3xl font-bold text-white tracking-wide">
-                    Inicia sesión en tu cuenta
-                </h1>
-                <p class="mt-4 text-xs text-gray-400 leading-relaxed">
-                    Accede para gestionar tus compras o entra como administrador con credenciales especiales.
-                </p>
+<body class="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
+    <main class="grid min-h-screen lg:grid-cols-[1.05fr_.95fr]">
+        <section class="relative hidden overflow-hidden bg-[#111827] lg:block">
+            <img src="img/fondo_registro_1.jpg" alt="Colección SneakerX" class="absolute inset-0 h-full w-full object-cover opacity-55">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#111827] via-[#111827]/45 to-transparent">
+</div>
+            <div class="relative z-10 flex h-full flex-col justify-between p-10 text-white xl:p-16">
+                <a href="index.html" class="flex items-center gap-3">
+<span class="grid h-10 w-10 place-items-center rounded-xl bg-white text-lg font-black text-[#111827]">S</span>
+<span>
+<strong class="block text-lg tracking-tight">SneakerX</strong>
+<small class="block text-[10px] font-semibold tracking-[0.22em] text-slate-300">Movimiento Diferente</small>
+</span>
+</a>
+                <div class="max-w-md">
+<p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">Tu próximo par empieza aquí</p>
+<h1 class="mt-4 text-5xl font-bold tracking-tight xl:text-7xl">Entra.<br>Muévete.</h1>
+<p class="mt-5 leading-7 text-slate-300">Accede a tu cuenta para continuar descubriendo la selección SneakerX.</p>
+</div>
             </div>
-
-            <div class="w-full lg:w-1/2 lg:pl-12">
-                <div id="login-error" class="mb-6 hidden rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm font-medium text-red-400"></div>
-
-                <form id="login-form">
-                    <div class="relative flex items-center mb-6">
-                        <input type="email" id="login-email" required class="block w-full py-3 pl-4 pr-11 text-gray-300 bg-transparent border border-gray-700 rounded-lg focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring focus:ring-opacity-40 placeholder-gray-500" placeholder="Correo electrónico">
-                        <span class="absolute right-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </span>
-                    </div>
-
-                    <div class="relative flex items-center mb-6">
-                        <input type="password" id="login-password" required class="block w-full py-3 pl-4 pr-11 text-gray-300 bg-transparent border border-gray-700 rounded-lg focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring focus:ring-opacity-40 placeholder-gray-500" placeholder="Contraseña">
-                        <span class="absolute right-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                        </span>
-                    </div>
-
-                    <div class="flex items-center justify-between mt-8">
-                        <a href="#" class="text-sm text-blue-400 transition-colors hover:text-blue-300 hover:underline">
-                            ¿Olvidaste tu contraseña?
-                        </a>
-                        
-                        <button type="submit" class="w-1/2 px-6 py-3 text-sm font-medium tracking-wide text-white transition-colors duration-300 transform bg-[#4285F4] rounded-lg hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
-                            Iniciar Sesión
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="mt-16 lg:mt-24 pt-8 flex justify-end">
-            <a href="index.html" class="inline-flex items-center text-gray-400 hover:text-blue-400 transition-colors group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <span class="text-sm font-medium">Volver</span>
-            </a>
-        </div>
-    </div>
+        </section>
+        <section class="flex items-center justify-center px-6 py-12 sm:px-10 lg:px-16">
+<div class="w-full max-w-md">
+<a href="index.html" class="flex items-center gap-3 lg:hidden">
+<span class="grid h-10 w-10 place-items-center rounded-xl bg-[#111827] text-lg font-black text-white">S</span>
+<span>
+<strong class="block text-lg tracking-tight">SneakerX</strong>
+<small class="block text-[10px] font-semibold tracking-[0.22em] text-slate-400">Movimiento Diferente</small>
+</span>
+</a>
+<div class="mt-12 sm:mt-0">
+<p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Bienvenido de nuevo</p>
+<h2 class="mt-3 text-4xl font-bold tracking-tight">Inicia sesión</h2>
+<p class="mt-4 leading-7 text-slate-500">Accede para gestionar tus compras o entrar al panel administrativo.</p>
+<div id="login-error" class="mt-6 hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+</div>
+<form id="login-form" class="mt-8 space-y-5">
+<label class="block text-sm font-semibold text-slate-700">Correo electrónico<input type="email" id="login-email" required class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="tu@correo.com">
+</label>
+<label class="block text-sm font-semibold text-slate-700">Contraseña<input type="password" id="login-password" required class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="Ingresa tu contraseña">
+</label>
+<button type="submit" class="w-full rounded-xl bg-[#111827] px-5 py-4 text-sm font-semibold text-white transition hover:bg-slate-700">Iniciar sesión <span class="ml-2" aria-hidden="true">→</span>
+</button>
+</form>
+<div class="mt-8 flex items-center justify-between border-t border-slate-200 pt-6 text-sm">
+<a href="registro.html" class="font-semibold text-slate-900 hover:underline">Crear una cuenta</a>
+<a href="index.html" class="text-slate-500 transition hover:text-slate-900">Volver al inicio</a>
+</div>
+</div>
+</div>
 </section>
-
-<script src="js/login.js"></script>
+    </main>
+    <script src="js/login.js">
+</script>
 </body>
 </html>

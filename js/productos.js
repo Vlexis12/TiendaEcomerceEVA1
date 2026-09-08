@@ -249,7 +249,7 @@ function cargarPerfilUsuario() {
         if (emailAdmin) emailAdmin.textContent = usuarioActivo.email;
         
     } else {
-        window.location.href = 'login.html';
+        window.location.href = '../login.html';
     }
 }
 

@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productos | SneakerX Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+</script>
 </head>
 <body class="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
 <div class="flex min-h-screen flex-col lg:flex-row">
@@ -81,7 +82,7 @@
                     <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-xl text-slate-800">+</span>
                     <div>
                         <h2 id="form-title" class="text-xl font-bold">Agregar Nueva Zapatilla</h2>
-                        <p class="mt-1 text-sm text-slate-500">Añade modelos Nike o zapatillas deportivas al catálogo.</p>
+                        <p class="mt-1 text-sm text-slate-500">Añade zapatillas deportivas al catálogo.</p>
                     </div>
                 </div>
                 <form id="product-form" class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -96,7 +97,7 @@
                     </div>
                     <div>
                         <label for="image" class="mb-2 block text-sm font-semibold text-slate-700">Imagen de la zapatilla</label>
-                        <input type="url" id="image" placeholder="URL de imagen Nike o del modelo" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
+                        <input type="url" id="image" placeholder="URL de imagen del modelo" required class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100">
                     </div>
                     <div class="flex items-end gap-2">
                         <button type="submit" id="btn-save" class="w-full rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Guardar</button>
@@ -131,6 +132,7 @@
         </div>
     </main>
 </div>
-<script src="../js/productos.js" defer></script>
+<script src="../js/productos.js" defer>
+</script>
 </body>
 </html>

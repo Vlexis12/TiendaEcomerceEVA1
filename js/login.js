@@ -12,10 +12,21 @@ document.addEventListener('DOMContentLoaded', () => {
             loginError.classList.add('hidden');
 
             // 1. Obtener base de datos de usuarios del LocalStorage
-            const storedUsers = JSON.parse(localStorage.getItem('store_users')) || [];
+            const defaultAdmin = {
+                id: 1,
+                name: 'Jhon Doe',
+                role: 'Administrador',
+                email: 'jhon.doe@adminshop.cl',
+                password: 'admin123'
+            };
+            const storedUsers = JSON.parse(localStorage.getItem('store_users') || 'null');
+            const users = Array.isArray(storedUsers) && storedUsers.length ? storedUsers : [defaultAdmin];
+            if (!storedUsers?.length) {
+                localStorage.setItem('store_users', JSON.stringify(users));
+            }
 
             // 2. Buscar si existe coincidencia de correo y contraseña
-            const userMatch = storedUsers.find(user => user.email === emailInput && user.password === passwordInput);
+            const userMatch = users.find(user => user.email === emailInput && user.password === passwordInput);
 
             if (userMatch) {
                 const esAdmin = userMatch.role === 'Administrador';
