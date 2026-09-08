@@ -1,16 +1,17 @@
 const PRODUCTS_KEY = 'store_products';
 const CART_KEY = 'carrito';
 
+const availableSizes = [39, 40, 41, 42, 43, 44];
 const defaultProducts = [
-    { id: 1, name: 'Nike Air Force 1', price: 119990, image: 'img/zapatillas/af1.webp', description: 'El clásico blanco que funciona con todo.', previousPrice: 150000 },
-    { id: 2, name: 'Nike Jordan 1 Low', price: 129990, image: 'img/zapatillas/jordan1.webp', description: 'Perfil bajo, actitud alta y comodidad diaria.', previousPrice: 160000 },
-    { id: 3, name: 'Nike Book 2 Tigers', price: 115990, image: 'img/zapatillas/book21.webp', description: 'Rendimiento y estilo para dominar la cancha.', previousPrice: 180000 },
-    { id: 4, name: 'Nike Shox R4', price: 219990, image: 'img/zapatillas/NikeShoxR4.jpg', description: 'El balance justo entre retro y actual.', previousPrice: 320000 },
-    { id: 5, name: 'Jordan Retro 11', price: 219990, image: 'img/zapatillas/retro11.jpg', description: 'El balance justo entre retro y actual.', previousPrice: 320000 },
-    { id: 6, name: 'Jordan Retro 6', price: 219990, image: 'img/zapatillas/retro6.jpg', description: 'El balance justo entre retro y actual.', previousPrice: 320000 },
-    { id: 7, name: 'Jordan Retro 3', price: 219990, image: 'img/zapatillas/retro3.webp', description: 'El balance justo entre retro y actual.', previousPrice: 320000 },
-    { id: 8, name: 'Jordan Retro 5', price: 219990, image: 'img/zapatillas/retro5.png', description: 'El balance justo entre retro y actual.', previousPrice: 320000 }
-]
+    { id: 1, name: 'Nike Air Force 1', price: 119990, image: 'img/zapatillas/af1.webp', description: 'Cuero limpio, amortiguación suave y una silueta que nunca pierde presencia.', previousPrice: 150000 },
+    { id: 2, name: 'Nike Jordan 1 Low', price: 129990, image: 'img/zapatillas/jordan1.webp', description: 'Perfil bajo y espíritu de cancha para construir looks urbanos todos los días.', previousPrice: 160000 },
+    { id: 3, name: 'Nike Book 2 Tigers', price: 115990, image: 'img/zapatillas/book21.webp', description: 'Respuesta ligera y soporte firme para quienes convierten el movimiento en juego.', previousPrice: 180000 },
+    { id: 4, name: 'Nike Shox R4', price: 219990, image: 'img/zapatillas/NikeShoxR4.jpg', description: 'Tecnología visible y estética futurista para destacar desde cada ángulo.', previousPrice: 320000 },
+    { id: 5, name: 'Jordan Retro 11', price: 219990, image: 'img/zapatillas/retro11.jpg', description: 'Un acabado elegante con energía competitiva y presencia de colección.', previousPrice: 320000 },
+    { id: 6, name: 'Jordan Retro 6', price: 219990, image: 'img/zapatillas/retro6.jpg', description: 'Inspiración noventera, paneles estructurados y una actitud lista para la calle.', previousPrice: 320000 },
+    { id: 7, name: 'Jordan Retro 3', price: 219990, image: 'img/zapatillas/retro3.webp', description: 'Texturas clásicas y amortiguación confiable en una forma reconocible al instante.', previousPrice: 320000 },
+    { id: 8, name: 'Jordan Retro 5', price: 219990, image: 'img/zapatillas/retro5.png', description: 'Lengüeta protagonista y detalles inspirados en la velocidad para un estilo audaz.', previousPrice: 320000 }
+];
 function toClpValue(value) {
     const amount = Number(value || 0);
     return amount > 0 && amount < 1000 ? Math.round(amount * 1000) : amount;
@@ -29,9 +30,15 @@ function normalizeProduct(product) {
         name,
         price,
         image,
-        description: product.description || product.descripcion || 'Zapatilla seleccionada por StepHouse.',
+        description: getProductDescription(product),
+        sizes: availableSizes,
         previousPrice: toClpValue(product.previousPrice || product.precioAnterior?.replace(/[^0-9.]/g, '') || price)
     };
+}
+
+function getProductDescription(product) {
+    const featured = defaultProducts.find(item => item.id === Number(product.id) || item.name === product.name);
+    return featured?.description || product.description || product.descripcion || 'Una zapatilla seleccionada para acompañar tu ritmo y tu estilo.';
 }
 
 function getProducts() {
@@ -148,8 +155,17 @@ function renderStorefront() {
     const grid = document.getElementById('grid-productos');
     if (!grid) return;
     const products = getProducts();
-    grid.innerHTML = products.map(product => `<article class="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg"><div class="h-72 overflow-hidden bg-slate-100"><img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105"></div><div class="flex flex-1 flex-col p-5"><p class="text-xs uppercase tracking-wider text-slate-400">Zapatilla StepHouse</p><h2 class="mt-2 text-lg font-bold">${product.name}</h2><p class="mt-2 flex-1 text-sm leading-6 text-slate-500">${product.description}</p><div class="mt-5 flex items-center justify-between"><div><span class="font-bold">${formatCLP(product.price)}</span><span class="ml-2 text-sm text-slate-400 line-through">${formatCLP(product.previousPrice)}</span></div><button type="button" data-id="${product.id}" class="btn-agregar rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">Añadir</button></div></div></article>`).join('');
-    grid.querySelectorAll('.btn-agregar').forEach(button => button.addEventListener('click', event => addToCart(Number(event.currentTarget.dataset.id))));
+    const sizeOptions = availableSizes.map(size => `<option value="${size}">${size}</option>`).join('');
+    grid.innerHTML = products.map(product => `<article class="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg"><div class="h-72 overflow-hidden bg-slate-100"><img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105"></div><div class="flex flex-1 flex-col p-5"><p class="text-xs uppercase tracking-wider text-slate-400">Zapatilla StepHouse</p><h2 class="mt-2 text-lg font-bold">${product.name}</h2><p class="mt-2 flex-1 text-sm leading-6 text-slate-500">${product.description}</p><div class="mt-5"><label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="size-${product.id}">Talla</label><select id="size-${product.id}" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"><option value="">Selecciona 39 a 44</option>${sizeOptions}</select></div><div class="mt-5 flex items-center justify-between"><div><span class="font-bold">${formatCLP(product.price)}</span><span class="ml-2 text-sm text-slate-400 line-through">${formatCLP(product.previousPrice)}</span></div><button type="button" data-id="${product.id}" class="btn-agregar rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">Añadir</button></div></div></article>`).join('');
+    grid.querySelectorAll('.btn-agregar').forEach(button => button.addEventListener('click', event => {
+        const id = Number(event.currentTarget.dataset.id);
+        const size = document.getElementById(`size-${id}`).value;
+        if (!size) {
+            alert('Selecciona una talla entre 39 y 44.');
+            return;
+        }
+        addToCart(id, Number(size));
+    }));
 }
 
 function updateCartBadge() {
@@ -160,26 +176,26 @@ function updateCartBadge() {
     badge.classList.toggle('hidden', total === 0);
 }
 
-function addToCart(id) {
+function addToCart(id, size) {
     const product = getProducts().find(item => item.id === id);
     if (!product) return;
     const cart = getCart();
-    const existing = cart.find(item => item.id === id);
+    const existing = cart.find(item => item.id === id && item.size === size);
     if (existing) existing.cantidad += 1;
-    else cart.push({ ...product, cantidad: 1 });
+    else cart.push({ ...product, size, cantidad: 1 });
     saveCart(cart);
     renderCartViews();
     document.getElementById('carrito')?.classList.remove('hidden');
 }
 
-function removeFromCart(id) {
-    saveCart(getCart().filter(item => item.id !== id));
+function removeFromCart(id, size) {
+    saveCart(getCart().filter(item => !(item.id === id && (item.size || 0) === (size || 0))));
     renderCartViews();
 }
 
 function cartItemMarkup(item, page) {
     const removeClass = page ? 'btn-eliminar-pagina' : 'btn-eliminar';
-    return `<li class="flex items-center gap-4 py-4"><img src="${item.image || item.imagen}" alt="${item.name || item.nombre}" class="h-16 w-16 rounded-xl object-cover"><div class="min-w-0 flex-1"><h3 class="truncate text-sm font-semibold">${item.name || item.nombre}</h3><p class="mt-1 text-xs text-slate-500">${formatCLP(item.price ?? item.precioActual)} · Cantidad: ${item.cantidad}</p></div><button type="button" class="${removeClass} rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900" data-id="${item.id}" aria-label="Eliminar ${item.name || item.nombre}">×</button></li>`;
+    return `<li class="flex items-center gap-4 py-4"><img src="${item.image || item.imagen}" alt="${item.name || item.nombre}" class="h-16 w-16 rounded-xl object-cover"><div class="min-w-0 flex-1"><h3 class="truncate text-sm font-semibold">${item.name || item.nombre}</h3><p class="mt-1 text-xs text-slate-500">Talla ${item.size || 'única'} · ${formatCLP(item.price ?? item.precioActual)} · Cantidad: ${item.cantidad}</p></div><button type="button" class="${removeClass} rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900" data-id="${item.id}" data-size="${item.size || ''}" aria-label="Eliminar ${item.name || item.nombre} talla ${item.size || ''}">×</button></li>`;
 }
 
 function renderCartViews() {
@@ -188,7 +204,7 @@ function renderCartViews() {
     const pageList = document.getElementById('lista-carrito-pagina');
     if (sideList) sideList.innerHTML = cart.length ? cart.map(item => cartItemMarkup(item, false)).join('') : '<li class="py-8 text-center text-sm text-slate-500">Tu carrito está vacío.</li>';
     if (pageList) pageList.innerHTML = cart.length ? cart.map(item => cartItemMarkup(item, true)).join('') : '<li class="py-12 text-center text-sm text-slate-500">Tu carrito está vacío. Explora el catálogo para comenzar.</li>';
-    document.querySelectorAll('.btn-eliminar, .btn-eliminar-pagina').forEach(button => button.addEventListener('click', () => removeFromCart(Number(button.dataset.id))));
+    document.querySelectorAll('.btn-eliminar, .btn-eliminar-pagina').forEach(button => button.addEventListener('click', () => removeFromCart(Number(button.dataset.id), Number(button.dataset.size))));
     const subtotal = cart.reduce((sum, item) => sum + Number(item.price ?? item.precioActual) * Number(item.cantidad), 0);
     const iva = subtotal * 0.19;
     document.getElementById('resumen-subtotal')?.replaceChildren(formatCLP(subtotal));
