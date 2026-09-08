@@ -224,9 +224,39 @@ function setupCartPanel() {
     document.getElementById('continuar-comprando')?.addEventListener('click', toggle);
 }
 
+function cargarPerfilUsuario() {
+    const avatarAdmin = document.getElementById('admin-avatar');
+    const nombreAdmin = document.getElementById('admin-nombre');
+    const emailAdmin = document.getElementById('admin-email');
+
+    if (!nombreAdmin) return;
+
+    const sesionStr = localStorage.getItem('usuarioLogueado');
+    
+    if (sesionStr) {
+        const usuarioActivo = JSON.parse(sesionStr);
+        
+        const inicialesText = usuarioActivo.nombre
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(word => word[0])
+            .join('')
+            .toUpperCase();
+
+        if (avatarAdmin) avatarAdmin.textContent = inicialesText;
+        if (nombreAdmin) nombreAdmin.textContent = usuarioActivo.nombre;
+        if (emailAdmin) emailAdmin.textContent = usuarioActivo.email;
+        
+    } else {
+        window.location.href = 'login.html';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     setupAdmin();
     renderStorefront();
     setupCartPanel();
     renderCartViews();
+    cargarPerfilUsuario();
 });
