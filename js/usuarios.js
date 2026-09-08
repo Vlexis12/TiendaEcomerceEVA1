@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'store_users';
-const defaultUsers = [{ id: 1, name: 'Alexis Rozas', role: 'Administrador', email: 'alexis.rozas@adminshop.cl' }];
+const defaultUsers = [{ id: 1, name: 'Alexis Rozas', role: 'Administrador', email: 'alexis.rozas@adminshop.cl', password: 'admin123' }];
 let users = loadUsers();
 
 const tableBody = document.getElementById('usersTableBody');
@@ -7,6 +7,7 @@ const modal = document.getElementById('userModal');
 const form = document.getElementById('userForm');
 const userNameInput = document.getElementById('userName');
 const userRoleSelect = document.getElementById('userRole');
+const userPasswordInput = document.getElementById('userPassword');
 const userEmailInput = document.getElementById('userEmail');
 const userIdInput = document.getElementById('userId');
 const modalTitle = document.getElementById('modalTitle');
@@ -67,6 +68,7 @@ window.openModal = function (id = null) {
         userNameInput.value = user.name;
         userRoleSelect.value = user.role;
         userEmailInput.value = user.email;
+        userPasswordInput.value = user.password;
     } else {
         modalTitle.textContent = 'Crear usuario';
         updateEmail();
@@ -99,7 +101,13 @@ searchInput.addEventListener('input', renderTable);
 form.addEventListener('submit', event => {
     event.preventDefault();
     const id = Number(userIdInput.value);
-    const user = { id: id || Date.now(), name: userNameInput.value.trim(), role: userRoleSelect.value, email: createEmail(userNameInput.value) };
+    const user = { 
+        id: id || Date.now(), 
+        name: userNameInput.value.trim(), 
+        role: userRoleSelect.value, 
+        email: createEmail(userNameInput.value),
+        password: userPasswordInput.value.trim() 
+    };
     if (id) users = users.map(item => item.id === id ? user : item);
     else users.push(user);
     saveUsers();
@@ -107,4 +115,31 @@ form.addEventListener('submit', event => {
     renderTable();
 });
 
+function cargarPerfilUsuario() {
+    const sesionStr = localStorage.getItem('usuarioLogueado');
+    
+    if (sesionStr) {
+        const usuarioActivo = JSON.parse(sesionStr);
+        
+        const primerNombre = usuarioActivo.nombre.split(' ')[0];
+        const inicialesText = initials(usuarioActivo.nombre);
+
+        const avatarAdmin = document.getElementById('admin-avatar');
+        const nombreAdmin = document.getElementById('admin-nombre');
+        const emailAdmin = document.getElementById('admin-email');
+        const saludoAdmin = document.getElementById('admin-saludo');
+        const accesoActualEmail = document.getElementById('admin-acceso-email'); 
+
+        if (avatarAdmin) avatarAdmin.textContent = inicialesText;
+        if (nombreAdmin) nombreAdmin.textContent = usuarioActivo.nombre;
+        if (emailAdmin) emailAdmin.textContent = usuarioActivo.email;
+        if (saludoAdmin) saludoAdmin.textContent = `Buenos días, ${primerNombre}`;
+        if (accesoActualEmail) accesoActualEmail.textContent = usuarioActivo.email;
+        
+    } else {
+        window.location.href = 'login.html';
+    }
+}
+
 renderTable();
+cargarPerfilUsuario();
