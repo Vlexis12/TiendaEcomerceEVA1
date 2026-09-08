@@ -24,7 +24,8 @@
                 <a href="contacto.html" class="transition hover:text-slate-900">Contacto</a>
             </div>
             <div class="flex items-center gap-3">
-                <a href="registro.html" class="hidden rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900 sm:inline-flex">Ingresar</a>
+                <a data-session-account href="login.html" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900">Ingresar</a>
+                <button type="button" data-session-logout class="hidden rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-500 transition hover:border-slate-900 hover:text-slate-900">Cerrar sesión</button>
                 <a href="productos.html" class="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">Comprar ahora</a>
             </div>
         </nav>
@@ -116,6 +117,8 @@
         </div>
     </footer>
     <script src="js/index.js">
+</script>
+    <script src="js/session.js">
 </script>
 </body>
 </html>

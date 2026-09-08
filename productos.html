@@ -30,7 +30,8 @@
 </svg>
 <span id="contador-carrito" class="absolute -right-2 -top-2 hidden rounded-full bg-[#111827] px-1.5 py-0.5 text-[10px] font-bold text-white">0</span>
 </button>
-<a href="login.html" class="hidden rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 sm:inline-flex">Ingresar</a>
+<a data-session-account href="login.html" class="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">Ingresar</a>
+<button type="button" data-session-logout class="hidden rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-500 transition hover:border-slate-900 hover:text-slate-900">Cerrar sesión</button>
 </div>
 </nav>
 </header>
@@ -80,6 +81,8 @@
 </div>
 </div>
 <script src="js/productos.js">
+</script>
+<script src="js/session.js">
 </script>
 </body>
 </html>
