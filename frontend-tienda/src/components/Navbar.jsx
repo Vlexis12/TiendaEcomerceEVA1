@@ -1,10 +1,18 @@
+import { useState } from 'react';
+import { getSession } from '../data/users';
+
 function Navbar({ totalItems = 0, activePath = window.location.pathname, onCartClick, cartOpen = false }) {
+    const [session, setSession] = useState(() => getSession());
     const cartClass = 'relative inline-flex appearance-none items-center rounded-full border border-slate-200 bg-transparent px-4 py-2 text-sm font-semibold leading-normal text-slate-700 no-underline shadow-none transition hover:border-slate-900 hover:bg-slate-50';
     const linkClass = (path) => (
         `no-underline transition ${activePath === path
             ? 'border-b-2 border-[#111827] pb-1 text-slate-900'
             : 'text-slate-500 hover:text-slate-900'}`
     );
+    const logout = () => {
+        localStorage.removeItem('usuarioLogueado');
+        setSession(null);
+    };
 
     return (
         <header className="border-b border-slate-200 bg-white">
@@ -42,7 +50,18 @@ function Navbar({ totalItems = 0, activePath = window.location.pathname, onCartC
                             🛒 ({totalItems})
                         </a>
                     )}
-                    <a href="/cuenta" style={{ color: '#111827' }} className="inline-flex items-center rounded-full bg-white px-4 py-2 text-xs font-semibold no-underline shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-100 sm:text-sm">Ingresar</a>
+                    {session ? (
+                        <>
+                            <a href={session.rol === 'admin' ? '/admin/home.html' : '/cuenta'} style={{ color: '#111827' }} className="inline-flex max-w-40 items-center truncate rounded-full bg-white px-4 py-2 text-xs font-semibold no-underline shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-100 sm:text-sm" title={`Sesión iniciada como ${session.nombre}`}>
+                                {session.nombre}
+                            </a>
+                            <button type="button" onClick={logout} className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-900 hover:bg-slate-50 active:bg-slate-100 active:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 sm:text-sm">
+                                Salir
+                            </button>
+                        </>
+                    ) : (
+                        <a href="/cuenta" style={{ color: '#111827' }} className="inline-flex items-center rounded-full bg-white px-4 py-2 text-xs font-semibold no-underline shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-100 sm:text-sm">Ingresar</a>
+                    )}
                 </div>
             </nav>
         </header>
