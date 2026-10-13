@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { formatCLP } from '../data/db';
+import { createPurchase } from '../data/purchases';
+import { getSession } from '../data/users';
 import Navbar from '../components/Navbar';
 
 const imagePath = (image) => image.startsWith('/') ? image : `/${image}`;
 
 function Pago({ carrito, onPagoCompletado }) {
-    const [form, setForm] = useState({ nombre: '', apellido: '', rut: '', telefono: '', direccion: '', observaciones: '', metodoPago: '', tarjeta: '', vencimiento: '', cvv: '' });
+    const session = getSession();
+    const [form, setForm] = useState({ nombre: '', apellido: '', email: session?.email || '', rut: '', telefono: '', direccion: '', observaciones: '', metodoPago: '', tarjeta: '', vencimiento: '', cvv: '' });
     const [error, setError] = useState('');
     const [comprobante, setComprobante] = useState(null);
     const subtotal = carrito.reduce((sum, item) => sum + Number(item.price) * item.cantidad, 0);
@@ -38,9 +41,38 @@ function Pago({ carrito, onPagoCompletado }) {
             setError('Tu carrito está vacío.');
             return;
         }
-        setError('');
-        setComprobante({ ...form, total: subtotal + iva });
-        onPagoCompletado();
+        const buyerEmail = (session?.email || form.email).trim().toLowerCase();
+        if (!buyerEmail) {
+            setError('Ingresa un correo para identificar al comprador en la boleta.');
+            return;
+        }
+        try {
+            const total = Math.round(subtotal + iva);
+            const purchase = createPurchase({
+                buyer: {
+                    name: session?.nombre || `${form.nombre.trim()} ${form.apellido.trim()}`.trim(),
+                    email: buyerEmail,
+                    accountEmail: session?.email || null,
+                },
+                items: carrito.map(({ id, name, price, image, size, cantidad }) => ({ id, name, price: Number(price), image, size, quantity: Number(cantidad) })),
+                subtotal,
+                tax: Math.round(iva),
+                total,
+                paymentMethod: form.metodoPago,
+                delivery: {
+                    name: `${form.nombre.trim()} ${form.apellido.trim()}`.trim(),
+                    rut: form.rut,
+                    phone: form.telefono,
+                    address: form.direccion || 'Retiro en tienda',
+                    notes: form.observaciones,
+                },
+            });
+            setError('');
+            setComprobante(purchase);
+            onPagoCompletado();
+        } catch (purchaseError) {
+            setError(purchaseError.message || 'No se pudo guardar la compra. Inténtalo nuevamente.');
+        }
     };
 
     return (
@@ -56,6 +88,7 @@ function Pago({ carrito, onPagoCompletado }) {
                             <div className="grid gap-5 sm:grid-cols-2">
                                 <Field label="Nombre" name="nombre" value={form.nombre} onChange={actualizar} required />
                                 <Field label="Apellido" name="apellido" value={form.apellido} onChange={actualizar} required />
+                                {!session && <Field label="Correo del comprador" name="email" type="email" value={form.email} onChange={actualizar} placeholder="tu@correo.com" required />}
                                 <Field label="RUT" name="rut" value={form.rut} onChange={actualizar} placeholder="12345678-9" required />
                                 <Field label="Teléfono" name="telefono" value={form.telefono} onChange={actualizar} placeholder="9 1234 5678" required />
                             </div>
@@ -69,7 +102,7 @@ function Pago({ carrito, onPagoCompletado }) {
                     <aside className="h-fit rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200"><h2 className="text-lg font-bold">Resumen de compra</h2><ul className="mt-6 max-h-[350px] space-y-3 overflow-y-auto">{carrito.length ? carrito.map((item) => <li key={`${item.id}-${item.size}`} className="flex items-center justify-between gap-4 border-b border-slate-200 py-3"><div className="flex items-center gap-3"><img src={imagePath(item.image)} alt={item.name} className="h-12 w-12 rounded-xl object-cover" /><div><h3 className="text-sm font-bold">{item.name}</h3><small className="text-xs text-slate-500">Talla {item.size} · Cantidad: {item.cantidad}</small></div></div><span className="text-sm font-bold">{formatCLP(item.price * item.cantidad)}</span></li>) : <li className="py-4 text-center text-sm text-slate-400">Tu carrito está vacío.</li>}</ul><dl className="mt-6 space-y-3 border-t border-slate-200 pt-5 text-sm"><Summary label="Subtotal" value={subtotal} /><Summary label="IVA (19%)" value={iva} /><div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold"><dt>Total</dt><dd>{formatCLP(subtotal + iva)}</dd></div></dl></aside>
                 </div>
             </main>
-            {comprobante && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4"><div className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-xl"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600">✓</div><h2 className="mt-4 text-center text-2xl font-bold">¡Compra finalizada!</h2><p className="mt-2 text-center text-sm text-slate-500">Tu pedido ha sido procesado exitosamente.</p><div className="mt-6 space-y-2 rounded-xl bg-slate-50 p-4 text-sm"><p><b>Nombre:</b> {comprobante.nombre} {comprobante.apellido}</p><p><b>RUT:</b> {comprobante.rut}</p><p><b>Teléfono:</b> {comprobante.telefono}</p><p><b>Dirección:</b> {comprobante.direccion || 'Retiro en tienda'}</p><p className="border-t pt-2 font-bold">Total pagado: {formatCLP(comprobante.total)}</p></div><button type="button" onClick={() => { setComprobante(null); window.location.href = '/'; }} className="mt-6 w-full rounded-xl bg-[#111827] px-6 py-3 text-sm font-semibold text-white">Volver al inicio</button></div></div>}
+            {comprobante && <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/60 px-4 py-8"><div className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-xl"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600">✓</div><h2 className="mt-4 text-center text-2xl font-bold">¡Compra finalizada!</h2><p className="mt-2 text-center text-sm text-slate-500">Tu pedido ha sido procesado exitosamente.</p><div className="mt-6 space-y-2 rounded-xl bg-slate-50 p-4 text-sm"><p><b>Boleta:</b> {comprobante.receiptNumber}</p><p><b>Comprador:</b> {comprobante.buyer.name}</p><p><b>Correo:</b> {comprobante.buyer.email}</p><p><b>RUT:</b> {comprobante.delivery.rut}</p><p><b>Teléfono:</b> {comprobante.delivery.phone}</p><p><b>Dirección:</b> {comprobante.delivery.address}</p><div className="border-t pt-3"><b>Productos:</b><ul className="mt-2 space-y-1">{comprobante.items.map((item, index) => <li key={`${item.id}-${item.size}-${index}`} className="flex justify-between gap-4"><span>{item.name} · Talla {item.size} × {item.quantity}</span><span>{formatCLP(item.price * item.quantity)}</span></li>)}</ul></div><p><b>Forma de pago:</b> {comprobante.paymentMethod}</p><p className="border-t pt-2 font-bold">Total pagado: {formatCLP(comprobante.total)}</p></div><button type="button" onClick={() => { setComprobante(null); window.location.href = '/'; }} className="mt-6 w-full rounded-xl bg-[#111827] px-6 py-3 text-sm font-semibold text-white">Volver al inicio</button></div></div>}
         </div>
     );
 }
