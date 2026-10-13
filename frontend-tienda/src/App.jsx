@@ -9,6 +9,7 @@ import Cuenta from './pages/Cuenta';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
 import Pago from './pages/Pago';
+import AdminApp from './admin/AdminApp';
 import Navbar from './components/Navbar';
 import './App.css'; // Mantenemos tu archivo CSS por si tienes algo ahí
 import Blogs from './pages/Blogs';
@@ -67,6 +68,10 @@ function App() {
     const eliminarDelCarrito = (id, size) => cambiarCantidad(id, size, 0);
 
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+
+    if (window.location.pathname.startsWith('/admin')) {
+        return <AdminApp />;
+    }
 
     if (window.location.pathname === '/productos') {
         return (
@@ -203,7 +208,7 @@ function App() {
                     <div className="flex gap-5">
                         <a href="/nosotros" className="no-underline transition hover:text-white">Nosotros</a>
                         <a href="/productos" className="no-underline transition hover:text-white">Catálogo</a>
-                        <a href="/cuenta" className="no-underline transition hover:text-white">Ingresar</a>
+                        <a href="/cuenta" className="no-underline transition hover:text-white">Mi cuenta</a>
                     </div>
                 </div>
             </footer>
