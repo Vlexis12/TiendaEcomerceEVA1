@@ -39,7 +39,7 @@ function Nosotros({ totalItems = 0 }) {
                         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">El siguiente paso</p>
                         <h2 className="mt-3 text-4xl font-bold tracking-tight">Tu estilo no se queda quieto.</h2>
                         <p className="mt-5 leading-8 text-slate-500">Explora nuestra selección y encuentra el par que encaja contigo, desde clásicos esenciales hasta nuevas siluetas.</p>
-                        <a href="/productos" className="mt-7 inline-flex rounded-xl bg-[#111827] px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Ver catálogo →</a>
+                        <a href="/productos" className="btn btn-dark mt-4">Ver catálogo →</a>
                     </div>
                 </section>
             </main>

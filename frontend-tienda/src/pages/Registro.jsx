@@ -42,7 +42,7 @@ function Registro({ totalItems = 0 }) {
                     {error && <div className="mt-6 text-sm font-semibold text-red-500" role="alert">{error}</div>}
                     <form onSubmit={registrar} className="mt-8 grid gap-5 sm:grid-cols-2">
                         <Field label="Nombre" name="name" placeholder="Jhon" value={form.name} onChange={actualizar} required /><Field label="Apellido" name="lastName" placeholder="Die" value={form.lastName} onChange={actualizar} required /><Field label="Teléfono" name="phone" placeholder="+56 9 1234 5678" value={form.phone} onChange={actualizar} /><Field label="Correo electrónico" name="email" type="email" placeholder="nombre@dominio.com" value={form.email} onChange={actualizar} required /><Field label="Contraseña" name="password" type="password" placeholder="Crea una contraseña" value={form.password} onChange={actualizar} required /><Field label="Confirmar contraseña" name="confirmPassword" type="password" placeholder="Repite tu contraseña" value={form.confirmPassword} onChange={actualizar} required />
-                        <button type="submit" className="mt-2 flex items-center justify-center rounded-xl bg-[#111827] px-6 py-4 text-sm font-semibold text-white transition hover:bg-slate-700 sm:col-span-2">Crear mi cuenta <span className="ml-2">→</span></button>
+                        <button type="submit" className="btn btn-dark mt-2 w-100 py-3 sm:col-span-2">Crear mi cuenta <span className="ml-2">→</span></button>
                     </form>
                 </section>
             </main>

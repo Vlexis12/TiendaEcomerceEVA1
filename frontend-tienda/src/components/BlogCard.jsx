@@ -1,6 +1,4 @@
 
-import React from 'react';
-
 const BlogCard = ({ blog }) => {
   return (
     <div className="col-md-6 col-lg-4 mb-4">

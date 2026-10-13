@@ -34,8 +34,7 @@ export const Producto = ({ producto, onAgregarCarrito }) => {
                         type="button"
                         disabled={!talla}
                         onClick={() => onAgregarCarrito(producto, Number(talla))}
-                        className="rounded-full bg-[#111827] px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
-                        style={{ borderRadius: '9999px' }}
+                        className="btn btn-dark btn-sm"
                     >
                         Añadir
                     </button>

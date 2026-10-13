@@ -6,7 +6,7 @@ import AdminApp from './AdminApp';
 describe('historial de compras del administrador', () => {
     beforeEach(() => {
         localStorage.clear();
-        window.history.replaceState({}, '', '/admin/compras.html');
+        window.history.replaceState({}, '', '/admin/compras');
         localStorage.setItem('store_users', JSON.stringify([
             { id: 1, name: 'Admin', role: 'Administrador', email: 'admin@example.com', password: 'secret' },
         ]));
