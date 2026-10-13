@@ -17,7 +17,7 @@ function Login({ totalItems = 0 }) {
             }
 
             saveUserSession(user);
-            window.location.href = user.role === 'Administrador' ? '/admin/home.html' : '/';
+            window.location.href = user.role === 'Administrador' ? '/admin' : '/';
         } catch (loginError) {
             setError(loginError.message || 'No se pudo iniciar sesión. Inténtalo nuevamente.');
         }
@@ -46,7 +46,7 @@ function Login({ totalItems = 0 }) {
                         <form onSubmit={iniciarSesion} className="mt-8 space-y-5">
                             <label className="block text-sm font-semibold text-slate-700">Correo electrónico<input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="tu@correo.com" /></label>
                             <label className="block text-sm font-semibold text-slate-700">Contraseña<input type="password" required value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="Ingresa tu contraseña" /></label>
-                            <button type="submit" className="w-full rounded-xl bg-[#111827] px-5 py-4 text-sm font-semibold text-white transition hover:bg-slate-700">Iniciar sesión <span className="ml-2">→</span></button>
+                            <button type="submit" className="btn btn-dark w-100 py-3">Iniciar sesión <span className="ml-2">→</span></button>
                         </form>
                         <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-6 text-sm"><a href="/registro" className="font-semibold text-slate-900 hover:underline">Crear una cuenta</a><a href="/" className="text-slate-500 transition hover:text-slate-900">Volver al inicio</a></div>
                     </div>

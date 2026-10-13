@@ -12,10 +12,10 @@ import {
 } from '../data/users';
 
 const adminPaths = {
-    dashboard: '/admin/home.html',
-    users: '/admin/usuarios.html',
-    products: '/admin/productosadmin.html',
-    purchases: '/admin/compras.html',
+    dashboard: '/admin',
+    users: '/admin/usuarios',
+    products: '/admin/productos',
+    purchases: '/admin/compras',
 };
 
 const inputClass = 'w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100';
@@ -40,11 +40,11 @@ function AdminApp() {
 
     if (!session || !activeUser || activeUserRole !== 'Administrador') return null;
 
-    const currentPage = pathname.includes('usuarios')
+    const currentPage = pathname === '/admin/usuarios'
         ? 'users'
-        : pathname.includes('productosadmin')
+        : pathname === '/admin/productos'
             ? 'products'
-            : pathname.includes('compras')
+            : pathname === '/admin/compras'
                 ? 'purchases'
             : 'dashboard';
 
