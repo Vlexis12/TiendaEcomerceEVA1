@@ -11,6 +11,8 @@ import Registro from './pages/Registro';
 import Pago from './pages/Pago';
 import Navbar from './components/Navbar';
 import './App.css'; // Mantenemos tu archivo CSS por si tienes algo ahí
+import Blogs from './pages/Blogs';
+import BlogDetail from './pages/BlogDetail';
 
 const destacados = [
     { title: 'Nike Air Force 1', description: 'El clásico que siempre encuentra una nueva forma de destacar.', buttonText: 'Compra con un 20% de descuento', images: ['/img/zapatillas/af1.webp', '/img/zapatillas/af12.webp', '/img/zapatillas/af13.webp'] },
@@ -111,6 +113,31 @@ function App() {
     if (window.location.pathname === '/pago') {
         return <Pago carrito={carrito} onPagoCompletado={() => { setCarrito([]); saveCart([]); }} />;
     }
+
+    if (window.location.pathname === '/blog') {
+        return (
+            <div className="bg-[#f3f4f6] text-slate-900 antialiased min-h-screen">
+                <Navbar totalItems={totalItems} activePath="/blog" />
+                <main>
+                    <Blogs />
+                </main>
+            </div>
+        );
+    }
+
+    if (window.location.pathname.startsWith('/blog/')) {
+        const blogId = window.location.pathname.split('/')[2]; 
+        return (
+            <div className="bg-[#f3f4f6] text-slate-900 antialiased min-h-screen">
+                <Navbar totalItems={totalItems} activePath="/blog" />
+                <main>
+                    {}
+                    <BlogDetail id={blogId} /> 
+                </main>
+            </div>
+        );
+    }
+
 
     const coleccion = destacados[destacado];
     return (
