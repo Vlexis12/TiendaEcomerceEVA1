@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
-
-const defaultAdmin = {
-    id: 1,
-    name: 'Jhon Doe',
-    role: 'Administrador',
-    email: 'jhon.doe@adminshop.cl',
-    password: 'admin123',
-};
+import { findUserByEmail, getUsers, saveUserSession } from '../data/users';
 
 function Login({ totalItems = 0 }) {
     const [email, setEmail] = useState('');
@@ -16,23 +9,18 @@ function Login({ totalItems = 0 }) {
 
     const iniciarSesion = (event) => {
         event.preventDefault();
-        const storedUsers = JSON.parse(localStorage.getItem('store_users') || 'null');
-        const users = Array.isArray(storedUsers) && storedUsers.length ? storedUsers : [defaultAdmin];
-        if (!storedUsers?.length) localStorage.setItem('store_users', JSON.stringify(users));
+        try {
+            const user = findUserByEmail(getUsers(), email);
+            if (!user || user.password !== password.trim()) {
+                setError('Correo o contraseña incorrectos.');
+                return;
+            }
 
-        const user = users.find((item) => item.email === email.trim() && item.password === password.trim());
-        if (!user) {
-            setError('Correo o contraseña incorrectos.');
-            return;
+            saveUserSession(user);
+            window.location.href = user.role === 'Administrador' ? '/admin/home.html' : '/';
+        } catch (loginError) {
+            setError(loginError.message || 'No se pudo iniciar sesión. Inténtalo nuevamente.');
         }
-
-        const esAdmin = user.role === 'Administrador';
-        localStorage.setItem('usuarioLogueado', JSON.stringify({
-            nombre: user.name,
-            email: user.email,
-            rol: esAdmin ? 'admin' : 'usuario',
-        }));
-        window.location.href = esAdmin ? '/admin/home.html' : '/';
     };
 
     return (

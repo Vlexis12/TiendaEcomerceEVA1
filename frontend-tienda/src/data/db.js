@@ -19,7 +19,7 @@ const defaultProducts = [
 
 export const getProducts = () => {
     const stored = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || 'null');
-    if (!Array.isArray(stored) || stored.length === 0) {
+    if (!Array.isArray(stored)) {
         localStorage.setItem(PRODUCTS_KEY, JSON.stringify(defaultProducts));
         return defaultProducts;
     }
@@ -28,6 +28,11 @@ export const getProducts = () => {
 
 export const saveProducts = (products) => {
     localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+};
+
+export const sortProductsByPrice = (products, direction = 'asc') => {
+    const multiplier = direction === 'desc' ? -1 : 1;
+    return [...products].sort((left, right) => (Number(left.price) - Number(right.price)) * multiplier);
 };
 
 export const createProduct = (newProduct) => {

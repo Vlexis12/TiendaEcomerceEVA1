@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
+import { findUserByEmail, getUsers, saveUserSession, saveUsers } from '../data/users';
 
 function Registro({ totalItems = 0 }) {
     const [form, setForm] = useState({ name: '', lastName: '', phone: '', email: '', password: '', confirmPassword: '' });
@@ -17,13 +18,17 @@ function Registro({ totalItems = 0 }) {
         if (form.password.length < 6) return setError('La contraseña debe tener al menos 6 caracteres.');
         if (form.password !== form.confirmPassword) return setError('Las contraseñas no coinciden.');
 
-        const stored = JSON.parse(localStorage.getItem('store_users') || '[]');
-        const users = Array.isArray(stored) && stored.length ? stored : [{ id: 1, name: 'Jhon Die', role: 'Administrador', email: 'jhon.die@adminshop.cl', password: 'admin123' }];
-        if (users.some((user) => user.email === email)) return setError('El correo electrónico ya se encuentra registrado.');
+        let users;
+        try {
+            users = getUsers();
+        } catch (registrationError) {
+            return setError(registrationError.message || 'No se pudo leer la lista de usuarios.');
+        }
+        if (findUserByEmail(users, email)) return setError('El correo electrónico ya se encuentra registrado.');
 
-        users.push({ id: Date.now(), name: `${form.name.trim()} ${form.lastName.trim()}`, role: 'Usuario', email, password: form.password, phone: form.phone });
-        localStorage.setItem('store_users', JSON.stringify(users));
-        localStorage.setItem('usuarioLogueado', JSON.stringify({ nombre: form.name.trim(), email, rol: 'usuario' }));
+        const user = { id: Date.now(), name: `${form.name.trim()} ${form.lastName.trim()}`, role: 'Usuario', email, password: form.password, phone: form.phone };
+        saveUsers([...users, user]);
+        saveUserSession(user);
         window.location.href = '/';
     };
 
@@ -47,10 +52,6 @@ function Registro({ totalItems = 0 }) {
 
 function Field({ label, name, type = 'text', ...props }) {
     return <label className="text-sm font-semibold text-slate-700">{label}<input type={type} name={name} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" {...props} /></label>;
-}
-
-function Brand() {
-    return <a href="/" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[#111827] text-lg font-black text-white">S</span><span><strong className="block text-lg tracking-tight">SneakerX</strong><small className="block text-[10px] font-semibold tracking-[0.22em] text-slate-400">Movimiento Diferente</small></span></a>;
 }
 
 export default Registro;
