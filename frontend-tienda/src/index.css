@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
