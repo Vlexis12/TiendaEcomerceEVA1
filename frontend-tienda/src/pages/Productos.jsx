@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Producto } from '../components/Producto';
-import { formatCLP } from '../data/db';
+import { formatCLP, sortProductsByPrice } from '../data/db';
 import Navbar from '../components/Navbar';
 
 const imagePath = (image) => image.startsWith('/') ? image : `/${image}`;
@@ -8,6 +8,11 @@ const imagePath = (image) => image.startsWith('/') ? image : `/${image}`;
 function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, onEliminarProducto }) {
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
     const [mostrarMiniCarrito, setMostrarMiniCarrito] = useState(false);
+    const [sortOrder, setSortOrder] = useState('featured');
+    const sortedProducts = useMemo(
+        () => sortOrder === 'featured' ? productos : sortProductsByPrice(productos, sortOrder),
+        [productos, sortOrder],
+    );
 
     const agregarYMostrarCarrito = (producto, talla) => {
         onAgregarCarrito(producto, talla);
@@ -94,11 +99,21 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                         <h1 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">Elige tu próximo par.</h1>
                         <p className="mt-4 max-w-xl text-slate-500">Siluetas para todos los días.</p>
                     </div>
-                    <span className="rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-500 ring-1 ring-slate-200">Colección 2026</span>
+                    <div className="flex flex-col gap-3 sm:items-end">
+                        <span className="w-fit rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-500 ring-1 ring-slate-200">Colección 2026</span>
+                        <label className="text-sm font-semibold text-slate-700">
+                            Ordenar por precio
+                            <select value={sortOrder} onChange={(event) => setSortOrder(event.target.value)} className="mt-2 block w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100 sm:min-w-64">
+                                <option value="featured">Orden recomendado</option>
+                                <option value="asc">Menor precio a mayor</option>
+                                <option value="desc">Mayor precio a menor</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
 
                 <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {productos.map((producto) => (
+                    {sortedProducts.map((producto) => (
                         <Producto
                             key={producto.id}
                             producto={{ ...producto, image: imagePath(producto.image) }}
