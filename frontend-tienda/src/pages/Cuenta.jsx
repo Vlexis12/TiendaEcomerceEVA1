@@ -24,7 +24,7 @@ function Cuenta({ totalItems = 0 }) {
                     <h2 className="mt-3 text-4xl font-bold tracking-tight">¿Qué deseas hacer?</h2>
                     <p className="mt-4 leading-7 text-slate-500">Inicia sesión si ya tienes una cuenta o regístrate para comenzar.</p>
                     <div className="mt-8 grid gap-3">
-                        <a href="/login" className="rounded-xl bg-[#111827] px-5 py-4 text-sm font-semibold text-white transition hover:bg-slate-700">Iniciar sesión <span className="ml-2">→</span></a>
+                        <a href="/login" className="btn btn-dark">Iniciar sesión <span className="ml-2">→</span></a>
                         <a href="/registro" className="rounded-xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900">Crear una cuenta <span className="ml-2">→</span></a>
                     </div>
                     <a href="/" className="mt-8 inline-block text-sm text-slate-500 transition hover:text-slate-900">Volver al inicio</a>

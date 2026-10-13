@@ -1,14 +1,8 @@
-import React, { useState, useEffect } from 'react';
 import { getBlogById } from '../data/blogData';
 
 // Recibe "id" como propiedad desde App.jsx
 const BlogDetail = ({ id }) => { 
-  const [blog, setBlog] = useState(null);
-
-  useEffect(() => {
-    const data = getBlogById(id);
-    setBlog(data);
-  }, [id]);
+  const blog = getBlogById(id);
 
   if (!blog) {
     return <div className="container mt-5"><h2>Blog no encontrado</h2></div>;

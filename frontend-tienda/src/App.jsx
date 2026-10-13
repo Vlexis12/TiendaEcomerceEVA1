@@ -26,6 +26,7 @@ function App() {
     const [carrito, setCarrito] = useState(() => getCart());
     const [destacado, setDestacado] = useState(0);
     const [imagenDestacada, setImagenDestacada] = useState(0);
+    const [mostrarMiniCarrito, setMostrarMiniCarrito] = useState(false);
 
     useEffect(() => {
         const productTimer = window.setInterval(() => setDestacado((current) => (current + 1) % destacados.length), 20000);
@@ -49,6 +50,7 @@ function App() {
         
         setCarrito(nuevoCarrito);
         saveCart(nuevoCarrito);
+        setMostrarMiniCarrito(true);
     };
 
     const cambiarCantidad = (id, size, cantidad) => {
@@ -148,6 +150,25 @@ function App() {
     return (
         <div className="bg-[#f3f4f6] text-slate-900 antialiased min-h-screen">
             <Navbar totalItems={totalItems} activePath="/" />
+
+            {mostrarMiniCarrito && (
+                <aside className="fixed right-4 top-36 z-40 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15" aria-label="Resumen del carrito">
+                    <div className="flex items-center justify-between bg-[#111827] px-5 py-3 text-white">
+                        <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">Tu selección</p>
+                            <h2 className="mt-0.5 font-bold">Carrito <span className="ml-1 text-xs font-normal text-slate-300">({totalItems})</span></h2>
+                        </div>
+                        <button type="button" onClick={() => setMostrarMiniCarrito(false)} className="btn-close btn-close-white" aria-label="Cerrar resumen del carrito" />
+                    </div>
+                    <div className="p-4">
+                        <p className="mb-3 text-sm font-semibold text-slate-700">{totalItems} producto(s) agregado(s)</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button type="button" onClick={() => setMostrarMiniCarrito(false)} className="btn btn-outline-secondary btn-sm">Seguir comprando</button>
+                            <a href="/carrito" className="btn btn-dark btn-sm">Ir al carrito</a>
+                        </div>
+                    </div>
+                </aside>
+            )}
 
             {/* Contenido Principal */}
             <main>
