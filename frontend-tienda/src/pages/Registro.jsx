@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
-import { findUserByEmail, getUsers, saveUserSession, saveUsers } from '../data/users';
+import { authService } from '../services/api';
 
 function Registro({ totalItems = 0 }) {
     const [form, setForm] = useState({ name: '', lastName: '', phone: '', email: '', password: '', confirmPassword: '' });
@@ -8,7 +8,7 @@ function Registro({ totalItems = 0 }) {
 
     const actualizar = (event) => setForm({ ...form, [event.target.name]: event.target.value });
 
-    const registrar = (event) => {
+    const registrar = async (event) => {
         event.preventDefault();
         const email = form.email.trim().toLowerCase();
         const phone = form.phone.replace(/\D/g, '');
@@ -18,18 +18,29 @@ function Registro({ totalItems = 0 }) {
         if (form.password.length < 6) return setError('La contraseña debe tener al menos 6 caracteres.');
         if (form.password !== form.confirmPassword) return setError('Las contraseñas no coinciden.');
 
-        let users;
         try {
-            users = getUsers();
+            const username = `${form.name.trim()}_${form.lastName.trim()}`.toLowerCase().replace(/\s+/g, '_');
+            const data = await authService.register({
+                username,
+                password: form.password,
+                email,
+                phone: form.phone,
+                address: '',
+                comuna: '',
+            });
+            const usuario = data?.usuario || data?.user || {};
+            const userData = {
+                nombre: usuario.username || username,
+                email: usuario.email || email,
+                rol: (usuario.role || 'USER') === 'ADMIN' ? 'admin' : 'usuario',
+            };
+            localStorage.setItem('usuarioLogueado', JSON.stringify(userData));
+            if (data?.token) localStorage.setItem('sneakerx_jwt', data.token);
+            if (usuario?.id) localStorage.setItem('sneakerx_userId', String(usuario.id));
+            window.location.href = '/';
         } catch (registrationError) {
-            return setError(registrationError.message || 'No se pudo leer la lista de usuarios.');
+            setError(registrationError.message || 'No se pudo registrar. Inténtalo nuevamente.');
         }
-        if (findUserByEmail(users, email)) return setError('El correo electrónico ya se encuentra registrado.');
-
-        const user = { id: Date.now(), name: `${form.name.trim()} ${form.lastName.trim()}`, role: 'Usuario', email, password: form.password, phone: form.phone };
-        saveUsers([...users, user]);
-        saveUserSession(user);
-        window.location.href = '/';
     };
 
     return (

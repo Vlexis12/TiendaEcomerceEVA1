@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import { Producto } from '../components/Producto';
 import { formatCLP, sortProductsByPrice } from '../data/db';
 import Navbar from '../components/Navbar';
@@ -9,6 +9,8 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
     const [mostrarMiniCarrito, setMostrarMiniCarrito] = useState(false);
     const [sortOrder, setSortOrder] = useState('featured');
+    const [page, setPage] = useState(0);
+    const PAGE_SIZE = 12;
     const searchTerm = new URLSearchParams(window.location.search).get('buscar')?.trim().toLowerCase() || '';
     const filteredProducts = useMemo(
         () => productos.filter((producto) => {
@@ -22,6 +24,10 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
         () => sortOrder === 'featured' ? filteredProducts : sortProductsByPrice(filteredProducts, sortOrder),
         [filteredProducts, sortOrder],
     );
+    const totalPages = Math.max(1, Math.ceil(sortedProducts.length / PAGE_SIZE));
+    const paginatedProducts = sortedProducts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+    useEffect(() => { setPage(0); }, [sortOrder, searchTerm]);
 
     const agregarYMostrarCarrito = (producto, talla) => {
         onAgregarCarrito(producto, talla);
@@ -126,7 +132,7 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                 </div>
 
                 <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {sortedProducts.map((producto) => (
+                    {paginatedProducts.map((producto) => (
                         <Producto
                             key={producto.id}
                             producto={{ ...producto, image: imagePath(producto.image) }}
@@ -135,6 +141,13 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                     ))}
                 </div>
             </main>
+            <div className="mx-auto max-w-[100rem] px-4 pb-8 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-center gap-2">
+                    <button type="button" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-40">← Anterior</button>
+                    <span className="text-sm text-slate-500">Página {page + 1} de {totalPages}</span>
+                    <button type="button" disabled={page >= totalPages - 1} onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-40">Siguiente →</button>
+                </div>
+            </div>
 
             <footer className="bg-[#111827] px-6 py-8 text-slate-400 lg:px-8">
                 <div className="mx-auto flex max-w-[100rem] flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
