@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { formatCLP, getProducts, saveProducts } from '../data/db';
+import { formatCLP, getProducts as getLocalProducts, saveProducts } from '../data/db';
+import { productService, adminService, authService } from '../services/api';
 import { getPurchases } from '../data/purchases';
 import './AdminApp.css';
 import {
@@ -22,23 +23,45 @@ const inputClass = 'w-full rounded-xl border border-slate-200 px-4 py-3 outline-
 const buttonClass = 'rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 active:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2';
 
 function AdminApp() {
-    const [session, setSession] = useState(() => getSession());
-    const activeUser = getCurrentUser();
-    const activeUserRole = activeUser?.role;
+    const [session, setSession] = useState(null);
+    const [checking, setChecking] = useState(true);
+    const activeUserRole = session?.rol;
     const pathname = window.location.pathname;
 
     useEffect(() => {
+        let mounted = true;
+        const init = async () => {
+            let s = getSession();
+            if (!s && localStorage.getItem('sneakerx_jwt')) {
+                try {
+                    const profile = await authService.getProfile();
+                    s = { nombre: profile.username, email: profile.email, rol: profile.role === 'ADMIN' ? 'admin' : 'usuario' };
+                    localStorage.setItem('usuarioLogueado', JSON.stringify(s));
+                } catch {
+                    s = null;
+                }
+            }
+            if (mounted) {
+                setSession(s);
+                setChecking(false);
+            }
+        };
+        init();
+        return () => { mounted = false; };
+    }, []);
+
+    useEffect(() => {
+        if (checking) return;
         if (!session) {
             window.location.replace('/login');
-        } else if (!activeUserRole) {
-            localStorage.removeItem('usuarioLogueado');
-            window.location.replace('/login');
-        } else if (activeUserRole !== 'Administrador') {
+        } else if (activeUserRole !== 'admin' && activeUserRole !== 'Administrador') {
             window.location.replace('/');
         }
-    }, [activeUserRole, session]);
+    }, [checking, activeUserRole, session]);
 
-    if (!session || !activeUser || activeUserRole !== 'Administrador') return null;
+    if (checking) return <div className="min-h-screen grid place-items-center text-slate-500">Cargando panel...</div>;
+    if (!session) { window.location.replace('/login'); return <div className="min-h-screen grid place-items-center text-slate-500">Redirigiendo al login...</div>; }
+    if (activeUserRole !== 'admin' && activeUserRole !== 'Administrador') { window.location.replace('/'); return null; }
 
     const currentPage = pathname === '/admin/usuarios'
         ? 'users'
@@ -119,8 +142,20 @@ function PageHeader({ section, title, description, action }) {
 }
 
 function DashboardPage({ session }) {
-    const products = getProducts();
-    const admins = getUsers().filter((user) => user.role === 'Administrador').length;
+    const [productCount, setProductCount] = useState(0);
+    const [adminCount, setAdminCount] = useState(0);
+    useEffect(() => {
+        let mounted = true;
+        productService.getPage({ page: 0, size: 1 }).then((data) => {
+            if (mounted) setProductCount(data?.totalElements ?? (Array.isArray(data?.content) ? data.content.length : getLocalProducts().length));
+        }).catch(() => { if (mounted) setProductCount(getLocalProducts().length); });
+        adminService.listUsers().then((data) => {
+            if (mounted) setAdminCount((Array.isArray(data) ? data : []).filter((u) => u.role === 'ADMIN' || u.role === 'Administrador').length);
+        }).catch(() => { if (mounted) setAdminCount(getUsers().filter((u) => u.role === 'Administrador').length); });
+        return () => { mounted = false; };
+    }, []);
+    const products = productCount;
+    const admins = adminCount;
     const firstName = session.nombre.split(' ')[0];
     const greeting = new Date().getHours() < 12 ? 'Buenos días' : new Date().getHours() < 20 ? 'Buenas tardes' : 'Buenas noches';
 
@@ -129,7 +164,7 @@ function DashboardPage({ session }) {
             <PageHeader section="Resumen" title={`${greeting}, ${firstName}`} description="Resumen de la actividad de tu tienda." action={<a href="/" target="_blank" rel="noreferrer" className={`admin-dark-action ${buttonClass}`}>Ver tienda</a>} />
             <div className="px-6 py-8 lg:px-10">
                 <section className="grid gap-4 sm:grid-cols-3" aria-label="Indicadores del negocio">
-                    <Metric title="Productos publicados" value={products.length} detail="Catálogo sincronizado" />
+                    <Metric title="Productos publicados" value={products} detail="Catálogo sincronizado" />
                     <Metric title="Administradores" value={admins} detail="Perfiles con acceso" />
                     <article className="rounded-2xl border border-slate-200 bg-slate-900 p-5 text-white shadow-sm"><p className="text-sm text-slate-400">Estado de la tienda</p><p className="mt-3 text-3xl font-bold">Activa</p><p className="mt-2 text-xs text-slate-400">Lista para recibir visitas</p></article>
                 </section>
@@ -195,48 +230,97 @@ function formatPurchaseDate(value) {
 }
 
 function ProductsPage() {
-    const [products, setProducts] = useState(() => getProducts());
-    const [form, setForm] = useState({ id: '', name: '', price: '', image: '' });
+    const [products, setProducts] = useState([]);
+    const [form, setForm] = useState({ id: '', name: '', price: '', image: '', stock: '', category: 'Casual' });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+
+    const loadProducts = async (p = 0) => {
+        setLoading(true);
+        try {
+            const result = await productService.getPage({ page: p, size: 5 });
+            const mapped = (result.content || []).map((prod) => ({
+                id: prod.id,
+                name: prod.nombre || prod.name,
+                price: Number(prod.precio ?? prod.price ?? 0),
+                image: prod.imagenUrl || prod.image || '',
+                stock: prod.stock ?? 0,
+                category: prod.categoria || prod.category || 'Casual',
+                destacado: prod.destacado === true,
+            }));
+            setProducts(mapped.length ? mapped : getLocalProducts().slice(p * 5, p * 5 + 5));
+            setTotalPages(result.totalPages || 1);
+            setPage(result.number ?? p);
+        } catch {
+            const local = getLocalProducts();
+            setProducts(local.slice(p * 5, p * 5 + 5));
+            setTotalPages(Math.ceil(local.length / 5) || 1);
+            setPage(p);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { loadProducts(0); }, []);
     const editing = Boolean(form.id);
 
     const updateField = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
     const resetForm = () => {
-        setForm({ id: '', name: '', price: '', image: '' });
+        setForm({ id: '', name: '', price: '', image: '', stock: '', category: 'Casual' });
         setError('');
     };
-    const submitProduct = (event) => {
+    const submitProduct = async (event) => {
         event.preventDefault();
         const name = form.name.trim();
         const price = Number(form.price);
         const image = form.image.trim();
-        if (!/zapatilla|nike|air|jordan|runner|sneaker|sport|street|basket|court|force/i.test(name)) {
-            setError('Solo puedes ingresar zapatillas. Incluye una marca o modelo de zapatilla en el nombre.');
-            return;
-        }
+        const stock = Number(form.stock);
+        const category = form.category.trim() || 'Casual';
         if (!Number.isFinite(price) || price <= 0) {
             setError('Ingresa un precio válido para la zapatilla.');
             return;
         }
-
-        const updated = editing
-            ? products.map((product) => product.id === Number(form.id) ? { ...product, name, price, image } : product)
-            : [...products, { id: Date.now(), name, price, image }];
-        saveProducts(updated);
-        setProducts(updated);
-        resetForm();
+        if (!Number.isFinite(stock) || stock < 0) {
+            setError('Ingresa un stock válido (0 o mayor).');
+            return;
+        }
+        const payload = {
+            nombre: name,
+            descripcion: name,
+            precio: price,
+            stock: stock,
+            imagenUrl: image,
+            categoria: category,
+            activo: true,
+        };
+        try {
+            if (editing) {
+                await productService.update(form.id, payload);
+            } else {
+                await productService.create(payload);
+            }
+            await loadProducts(page);
+            resetForm();
+        } catch (err) {
+            setError(err.message || 'No se pudo guardar el producto.');
+        }
     };
     const editProduct = (product) => {
-        setForm({ id: String(product.id), name: product.name, price: String(product.price), image: product.image });
+        setForm({ id: String(product.id), name: product.name, price: String(product.price), image: product.image, stock: String(product.stock ?? 0), category: product.category || 'Casual' });
         setError('');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-    const deleteProduct = (id) => {
+    const deleteProduct = async (id) => {
         if (!window.confirm('¿Eliminar esta zapatilla del catálogo?')) return;
-        const updated = products.filter((product) => product.id !== id);
-        saveProducts(updated);
-        setProducts(updated);
-        if (Number(form.id) === id) resetForm();
+        try {
+            await productService.remove(id);
+            await loadProducts(page);
+            if (Number(form.id) === id) resetForm();
+        } catch (err) {
+            setError(err.message || 'No se pudo eliminar el producto.');
+        }
     };
 
     return (
@@ -255,17 +339,29 @@ function ProductsPage() {
                         <label className="text-sm font-semibold text-slate-700">Nombre de la zapatilla<input name="name" value={form.name} onChange={updateField} required className={`${inputClass} mt-2 font-normal`} placeholder="Ej. Nike Air Max 90" /></label>
                         <label className="text-sm font-semibold text-slate-700">Precio (CLP)<input name="price" type="number" min="1" step="1" value={form.price} onChange={updateField} required className={`${inputClass} mt-2 font-normal`} placeholder="119990" /></label>
                         <label className="text-sm font-semibold text-slate-700">Imagen de la zapatilla<input name="image" type="url" value={form.image} onChange={updateField} required className={`${inputClass} mt-2 font-normal`} placeholder="URL de imagen del modelo" /></label>
+                        <label className='text-sm font-semibold text-slate-700'>Stock<input name='stock' type='number' min='0' step='1' value={form.stock} onChange={updateField} required className='w-full rounded-xl border border-slate-200 px-4 py-3 mt-2 font-normal' placeholder='0' /> </label>
+                        <label className='text-sm font-semibold text-slate-700'>Categoría<select name='category' value={form.category} onChange={updateField} required className='w-full rounded-xl border border-slate-200 px-4 py-3 mt-2 font-normal bg-white'><option value='Casual'>Casual</option><option value='Running'>Running</option><option value='Basketball'>Basketball</option><option value='Skate'>Skate</option></select></label>
                         <div className="flex items-end gap-2"><button type="submit" className={`${buttonClass} w-full`}>{editing ? 'Actualizar' : 'Guardar'}</button>{editing && <button type="button" onClick={resetForm} className="w-1/3 rounded-xl bg-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-300 active:bg-slate-300 active:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2">Cancelar</button>}</div>
                     </form>
                 </section>
                 <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                     <div className="flex flex-col gap-2 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="font-bold">Catálogo publicado</h2><p className="mt-1 text-sm text-slate-500">Administra los productos visibles para tus clientes.</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Actualización instantánea</span></div>
                     <div className="overflow-x-auto"><table className="w-full min-w-[700px] text-left">
-                        <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th className="px-5 py-4">Imagen</th><th className="px-5 py-4">Producto</th><th className="px-5 py-4">Precio</th><th className="px-5 py-4 text-right">Acciones</th></tr></thead>
+                        <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th className="px-5 py-4">Imagen</th><th className="px-5 py-4">Producto</th><th className="px-5 py-4">Precio</th><th className="px-5 py-4">Stock</th><th className="px-5 py-4 text-right">Acciones</th></tr></thead>
                         <tbody className="divide-y divide-slate-100 text-slate-700">
-                            {products.length === 0 ? <tr><td colSpan="4" className="px-5 py-12 text-center text-sm text-slate-500">No hay zapatillas registradas.</td></tr> : products.map((product) => <tr key={product.id} className="transition hover:bg-slate-50"><td className="px-5 py-4"><img src={adminImagePath(product.image)} className="h-14 w-14 rounded-xl object-cover" alt={product.name} /></td><td className="px-5 py-4 font-semibold">{product.name}</td><td className="px-5 py-4">{formatCLP(product.price)}</td><td className="px-5 py-4 text-right"><button type="button" onClick={() => editProduct(product)} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 active:bg-slate-100 active:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500">Editar</button><button type="button" onClick={() => deleteProduct(product.id)} className="rounded-lg px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 active:bg-red-50 active:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">Eliminar</button></td></tr>)}
+                            {products.length === 0 ? <tr><td colSpan="4" className="px-5 py-12 text-center text-sm text-slate-500">No hay zapatillas registradas.</td></tr> : products.map((product) => <tr key={product.id} className="transition hover:bg-slate-50"><td className="px-5 py-4"><img src={adminImagePath(product.image)} className="h-14 w-14 rounded-xl object-cover" alt={product.name} /></td><td className="px-5 py-4 font-semibold">{product.name}</td><td className="px-5 py-4">{formatCLP(product.price)}</td><td className="px-5 py-4">{product.stock ?? 0}</td><td className="px-5 py-4 text-right"><button type="button" onClick={async () => { await productService.update(product.id, { destacado: !product.destacado }); await loadProducts(page); }} className="rounded-lg px-3 py-2 text-sm font-semibold text-amber-600 transition hover:bg-amber-50">{product.destacado ? '★ Destacado' : '☆ Destacar'}</button><button type="button" onClick={() => editProduct(product)} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 active:bg-slate-100 active:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500">Editar</button><button type="button" onClick={() => deleteProduct(product.id)} className="rounded-lg px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 active:bg-red-50 active:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">Eliminar</button></td></tr>)}
                         </tbody>
                     </table></div>
+                <div className='mt-6 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm'>
+                    <button type='button' onClick={() => loadProducts(Math.max(0, page - 1))} disabled={page === 0} className='rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40'>← Anterior</button>
+                    <div className='flex items-center gap-2'>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <button key={i} type='button' onClick={() => loadProducts(i)} className={`grid h-9 w-9 place-items-center rounded-xl text-sm font-semibold transition ${i === page ? 'bg-[#111827] text-white shadow' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{i + 1}</button>
+                        ))}
+                    </div>
+                    <button type='button' onClick={() => loadProducts(Math.min(totalPages - 1, page + 1))} disabled={page >= totalPages - 1} className='rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40'>Siguiente →</button>
+                </div>
+                <p className='mt-2 text-center text-xs text-slate-500'>Página {page + 1} de {totalPages}</p>
                 </section>
             </div>
         </>
@@ -282,8 +378,29 @@ function adminImagePath(image = '') {
 }
 
 function UsersPage({ session, setSession }) {
-    const [users, setUsers] = useState(() => getUsers());
+    const [users, setUsers] = useState([]);
     const [query, setQuery] = useState('');
+    const [page, setPage] = useState(0);
+    const USER_PAGE_SIZE = 5;
+
+    const loadUsers = async () => {
+        try {
+            const data = await adminService.listUsers();
+            const mapped = (Array.isArray(data) ? data : []).map((u) => ({
+                id: u.id,
+                name: u.username,
+                email: u.email,
+                role: u.role === 'ADMIN' ? 'Administrador' : 'Usuario',
+                phone: u.phone,
+                password: '',
+            }));
+            setUsers(mapped.length ? mapped : getUsers());
+        } catch {
+            setUsers(getUsers());
+        }
+    };
+
+    useEffect(() => { loadUsers(); }, []);
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState({ name: '', role: 'Administrador', password: '' });
@@ -294,9 +411,14 @@ function UsersPage({ session, setSession }) {
         const normalizedQuery = query.trim().toLowerCase();
         return users.filter((user) => `${user.name} ${user.email}`.toLowerCase().includes(normalizedQuery));
     }, [query, users]);
+    const totalUserPages = Math.max(1, Math.ceil(visibleUsers.length / USER_PAGE_SIZE));
+    const paginatedUsers = visibleUsers.slice(page * USER_PAGE_SIZE, (page + 1) * USER_PAGE_SIZE);
+
+    useEffect(() => { setPage(0); }, [query]);
     const generatedEmail = createAdminEmail(form.name);
 
     const openCreate = () => {
+        console.log('openCreate called');
         setEditingId(null);
         setForm({ name: '', role: 'Administrador', password: '' });
         setError('');
@@ -310,7 +432,7 @@ function UsersPage({ session, setSession }) {
     };
     const closeModal = () => setModalOpen(false);
     const updateField = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
-    const submitUser = (event) => {
+    const submitUser = async (event) => {
         event.preventDefault();
         const name = form.name.trim();
         const email = createAdminEmail(name);
@@ -323,39 +445,54 @@ function UsersPage({ session, setSession }) {
             setError('Debe existir al menos un administrador activo.');
             return;
         }
-
-        const user = {
-            id: editingId ?? Date.now(),
-            name,
-            role: form.role,
-            email,
-            password: form.password.trim(),
-        };
-        const updated = editingId
-            ? users.map((item) => item.id === editingId ? user : item)
-            : [...users, user];
-        saveUsers(updated);
-        setUsers(updated);
-
-        if (currentEmail === String(editingId ? users.find((item) => item.id === editingId)?.email : '').trim().toLowerCase()) {
-            const nextSession = { ...session, nombre: user.name, email: user.email, rol: user.role === 'Administrador' ? 'admin' : 'usuario' };
-            localStorage.setItem('usuarioLogueado', JSON.stringify(nextSession));
-            setSession(nextSession);
+        const username = name.toLowerCase().replace(/\s+/g, '_');
+        try {
+            if (editingId) {
+                await adminService.updateUser(editingId, {
+                    email,
+                    phone: null,
+                    address: null,
+                    comuna: null,
+                    role: form.role === 'Administrador' ? 'ADMIN' : 'USER',
+                });
+            } else {
+                await adminService.createUser({
+                    username,
+                    password: form.password.trim(),
+                    email,
+                    role: form.role,
+                    phone: null,
+                    address: null,
+                    comuna: null,
+                });
+            }
+            await loadUsers();
+            if (currentEmail === email) {
+                const nextSession = { ...session, nombre: name, email, rol: form.role === 'Administrador' ? 'admin' : 'usuario' };
+                localStorage.setItem('usuarioLogueado', JSON.stringify(nextSession));
+                setSession(nextSession);
+            }
+            closeModal();
+        } catch (err) {
+            console.error('Error al guardar usuario:', err);
+            setError(err.message || 'No se pudo guardar el usuario.');
         }
-        closeModal();
     };
-    const deleteUser = (user) => {
+    const deleteUser = async (user) => {
         if (user.role === 'Administrador' && adminsCount <= 1) {
             window.alert('Debe existir al menos un administrador activo.');
             return;
         }
         if (!window.confirm(`¿Eliminar el acceso de ${user.name}?`)) return;
-        const updated = users.filter((item) => item.id !== user.id);
-        saveUsers(updated);
-        setUsers(updated);
-        if (user.email.trim().toLowerCase() === currentEmail) {
-            localStorage.removeItem('usuarioLogueado');
-            window.location.assign('/login');
+        try {
+            await adminService.deleteUser(user.id);
+            await loadUsers();
+            if (user.email.trim().toLowerCase() === currentEmail) {
+                localStorage.removeItem('usuarioLogueado');
+                window.location.assign('/login');
+            }
+        } catch (err) {
+            setError(err.message || 'No se pudo eliminar el usuario.');
         }
     };
 
@@ -369,9 +506,10 @@ function UsersPage({ session, setSession }) {
                     <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-left">
                         <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th className="px-5 py-4">Usuario</th><th className="px-5 py-4">Rol</th><th className="px-5 py-4">Correo de acceso</th><th className="px-5 py-4 text-right">Acciones</th></tr></thead>
                         <tbody className="divide-y divide-slate-100">
-                            {visibleUsers.length === 0 ? <tr><td colSpan="4" className="px-5 py-12 text-center text-sm text-slate-500">No encontramos usuarios con esa búsqueda.</td></tr> : visibleUsers.map((user) => <tr key={user.id} className="transition hover:bg-slate-50"><td className="px-5 py-4"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-full bg-lime-100 text-xs font-bold text-lime-800">{initials(user.name)}</span><span className="font-semibold text-slate-800">{user.name}</span></div></td><td className="px-5 py-4"><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">{user.role}</span></td><td className="px-5 py-4 text-sm text-slate-500">{user.email}</td><td className="px-5 py-4"><div className="flex justify-end gap-2"><button type="button" onClick={() => openEdit(user)} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 active:bg-slate-100 active:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500">Editar</button><button type="button" onClick={() => deleteUser(user)} className="rounded-lg px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 active:bg-red-50 active:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">Eliminar</button></div></td></tr>)}
+                            {visibleUsers.length === 0 ? <tr><td colSpan="4" className="px-5 py-12 text-center text-sm text-slate-500">No encontramos usuarios con esa búsqueda.</td></tr> : paginatedUsers.map((user) => <tr key={user.id} className="transition hover:bg-slate-50"><td className="px-5 py-4"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-full bg-lime-100 text-xs font-bold text-lime-800">{initials(user.name)}</span><span className="font-semibold text-slate-800">{user.name}</span></div></td><td className="px-5 py-4"><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">{user.role}</span></td><td className="px-5 py-4 text-sm text-slate-500">{user.email}</td><td className="px-5 py-4"><div className="flex justify-end gap-2"><button type="button" onClick={() => openEdit(user)} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 active:bg-slate-100 active:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500">Editar</button><button type="button" onClick={() => deleteUser(user)} className="rounded-lg px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 active:bg-red-50 active:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">Eliminar</button></div></td></tr>)}
                         </tbody>
                     </table></div>
+                <div className='mt-4 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm'><button type='button' onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} className='rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-40'>← Anterior</button><span className='text-sm text-slate-500'>Página {page + 1} de {totalUserPages}</span><button type='button' onClick={() => setPage((p) => Math.min(totalUserPages - 1, p + 1))} disabled={page >= totalUserPages - 1} className='rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-40'>Siguiente →</button></div>
                 </section>
             </div>
             {modalOpen && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4" role="dialog" aria-modal="true" aria-labelledby="admin-user-modal-title" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
@@ -381,8 +519,10 @@ function UsersPage({ session, setSession }) {
                     <form onSubmit={submitUser} className="mt-6 space-y-5">
                         <label className="block text-sm font-semibold text-slate-700">Nombre completo<input name="name" value={form.name} onChange={updateField} required className={`${inputClass} mt-2`} placeholder="Ej. Alexis Rozas" /></label>
                         <label className="block text-sm font-semibold text-slate-700">Rol<select name="role" value={form.role} onChange={updateField} disabled={!editingId} className={`${inputClass} mt-2 bg-white disabled:cursor-not-allowed disabled:bg-slate-100`}><option value="Administrador">Administrador</option><option value="Usuario">Usuario</option></select></label>
-                        <label className="block text-sm font-semibold text-slate-700">Contraseña<input name="password" type="password" value={form.password} onChange={updateField} required className={`${inputClass} mt-2`} placeholder="••••••••" /></label>
+{!editingId && (<>
+                        <label className="block text-sm font-semibold text-slate-700">Contraseña<input name="password" type="password" value={form.password} onChange={updateField} required={!editingId} className={`${inputClass} mt-2`} placeholder="••••••••" /></label>
                         <label className="block text-sm font-semibold text-slate-700">Correo generado<input type="email" readOnly value={generatedEmail} className={`${inputClass} mt-2 cursor-not-allowed bg-slate-50 text-slate-600`} /><span className="mt-2 block text-xs font-normal text-slate-500">Se actualiza automáticamente según el nombre.</span></label>
+                        </>)}
                         <div className="flex justify-end gap-3 pt-2"><button type="button" onClick={closeModal} className="rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 active:bg-slate-100 active:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500">Cancelar</button><button type="submit" className={buttonClass}>Guardar usuario</button></div>
                     </form>
                 </div>

@@ -1,25 +1,33 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
-import { findUserByEmail, getUsers, saveUserSession } from '../data/users';
+import { authService, cartService, getSessionId, clearSessionId } from '../services/api';
 
 function Login({ totalItems = 0 }) {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const iniciarSesion = (event) => {
+    const iniciarSesion = async (event) => {
         event.preventDefault();
+        setError('');
         try {
-            const user = findUserByEmail(getUsers(), email);
-            if (!user || user.password !== password.trim()) {
-                setError('Correo o contraseña incorrectos.');
-                return;
+            const data = await authService.login(username.trim(), password.trim());
+            const usuario = data?.usuario || data?.user || {};
+            const userData = {
+                nombre: usuario.username || data?.username || username,
+                email: usuario.email || '',
+                rol: (usuario.role || data?.role) === 'ADMIN' ? 'admin' : 'usuario',
+            };
+            localStorage.setItem('usuarioLogueado', JSON.stringify(userData));
+            const sid = getSessionId();
+            const uid = localStorage.getItem('sneakerx_userId');
+            if (sid && uid) {
+                try { await cartService.transferCart(sid, uid); } catch {}
+                clearSessionId();
             }
-
-            saveUserSession(user);
-            window.location.href = user.role === 'Administrador' ? '/admin' : '/';
+            window.location.href = userData.rol === 'admin' ? '/admin' : '/';
         } catch (loginError) {
-            setError(loginError.message || 'No se pudo iniciar sesión. Inténtalo nuevamente.');
+            setError(loginError.message || 'Usuario o contraseña incorrectos.');
         }
     };
 
@@ -44,7 +52,7 @@ function Login({ totalItems = 0 }) {
                         <p className="mt-4 leading-7 text-slate-500">Accede para gestionar tus compras o entrar al panel administrativo.</p>
                         {error && <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="alert">{error}</div>}
                         <form onSubmit={iniciarSesion} className="mt-8 space-y-5">
-                            <label className="block text-sm font-semibold text-slate-700">Correo electrónico<input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="tu@correo.com" /></label>
+                            <label className="block text-sm font-semibold text-slate-700">Usuario o correo electrónico<input type="text" required value={username} onChange={(event) => setUsername(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="usuario o correo" /></label>
                             <label className="block text-sm font-semibold text-slate-700">Contraseña<input type="password" required value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="Ingresa tu contraseña" /></label>
                             <button type="submit" className="btn btn-dark w-100 py-3">Iniciar sesión <span className="ml-2">→</span></button>
                         </form>

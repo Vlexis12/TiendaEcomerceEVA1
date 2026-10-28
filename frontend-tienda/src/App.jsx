@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getProducts, getCart, saveCart } from './data/db';
+import { getProducts as getLocalProducts, getCart as getLocalCart, saveCart as saveLocalCart } from './data/db';
+import { productService, cartService, getOrCreateSessionId, getSessionId } from './services/api';
 import { Producto } from './components/Producto';
 import Productos from './pages/Productos';
 import Carrito from './pages/Carrito';
@@ -22,8 +23,31 @@ const destacados = [
 ];
 
 function App() {
-    const [productos] = useState(() => getProducts());
-    const [carrito, setCarrito] = useState(() => getCart());
+    const [productos, setProductos] = useState(() => getLocalProducts());
+    const [userId, setUserId] = useState(() => localStorage.getItem('sneakerx_userId'));
+    const [sessionId, setSessionId] = useState(() => getOrCreateSessionId());
+    const [carrito, setCarrito] = useState([]);
+
+    useEffect(() => {
+        let mounted = true;
+        productService.getAll({ size: 1000 })
+            .then((data) => {
+                if (!mounted || !Array.isArray(data) || data.length === 0) return;
+                const mapped = data.map((p) => ({
+                    id: p.id,
+                    name: p.nombre || p.name,
+                    price: Number(p.precio ?? p.price ?? 0),
+                    image: p.imagenUrl || p.image || '',
+                    description: p.descripcion || p.description || '',
+                    category: p.categoria || p.category || '',
+                    stock: p.stock,
+                    destacado: p.destacado === true,
+                }));
+                setProductos(mapped);
+            })
+            .catch(() => {});
+        return () => { mounted = false; };
+    }, []);
     const [destacado, setDestacado] = useState(0);
     const [imagenDestacada, setImagenDestacada] = useState(0);
     const [mostrarMiniCarrito, setMostrarMiniCarrito] = useState(false);
@@ -38,36 +62,78 @@ function App() {
         return () => window.clearInterval(imageTimer);
     }, [destacado]);
 
-    const agregarAlCarrito = (producto, talla = 'Unica') => {
-        const nuevoCarrito = [...carrito];
-        const existente = nuevoCarrito.find(item => item.id === producto.id && item.size === talla);
-        
-        if (existente) {
-            existente.cantidad += 1;
-        } else {
-            nuevoCarrito.push({ ...producto, size: talla, cantidad: 1 });
+    const mapCartItem = (item) => ({
+        id: item.producto?.id ?? item.productoId,
+        cartItemId: item.id,
+        name: item.producto?.nombre ?? item.name,
+        price: Number(item.precioUnitario ?? item.price ?? 0),
+        image: item.producto?.imagenUrl ?? item.image ?? '',
+        size: item.talla || 'Unica',
+        cantidad: item.cantidad,
+    });
+
+    const loadCart = async () => {
+        try {
+            let data;
+            if (userId) {
+                data = await cartService.getCart(userId);
+            } else {
+                data = await cartService.getGuestCart(sessionId);
+            }
+            const items = (data?.items || []).map(mapCartItem);
+            setCarrito(items);
+            saveLocalCart(items);
+        } catch {
+            setCarrito(getLocalCart());
         }
-        
-        setCarrito(nuevoCarrito);
-        saveCart(nuevoCarrito);
+    };
+
+    useEffect(() => { loadCart(); }, [userId]);
+
+    const agregarAlCarrito = async (producto, talla = 'Unica') => {
+        try {
+            if (userId) {
+                await cartService.addToCart(userId, producto.id, 1, talla);
+            } else {
+                await cartService.addToGuestCart(sessionId, producto.id, 1, talla);
+            }
+            await loadCart();
+        } catch {
+            const nuevoCarrito = [...carrito];
+            const existente = nuevoCarrito.find((item) => item.id === producto.id && item.size === talla);
+            if (existente) existente.cantidad += 1;
+            else nuevoCarrito.push({ ...producto, size: talla, cantidad: 1 });
+            setCarrito(nuevoCarrito);
+            saveLocalCart(nuevoCarrito);
+        }
         setMostrarMiniCarrito(true);
     };
 
-    const cambiarCantidad = (id, size, cantidad) => {
+    const cambiarCantidad = async (id, size, cantidad) => {
         const nuevaCantidad = Math.max(0, Number(cantidad));
-        const nuevoCarrito = nuevaCantidad === 0
-            ? carrito.filter((item) => !(item.id === id && item.size === size))
-            : carrito.map((item) => (
-                item.id === id && item.size === size
-                    ? { ...item, cantidad: nuevaCantidad }
-                    : item
-            ));
-
-        setCarrito(nuevoCarrito);
-        saveCart(nuevoCarrito);
+        const item = carrito.find((i) => i.id === id && i.size === size);
+        if (!item) return;
+        try {
+            if (nuevaCantidad === 0) {
+                if (userId) await cartService.removeCartItem(userId, item.cartItemId);
+                else await cartService.removeGuestCartItem(sessionId, item.cartItemId);
+            } else {
+                if (userId) await cartService.updateCartItem(userId, item.cartItemId, nuevaCantidad);
+                else await cartService.updateGuestCartItem(sessionId, item.cartItemId, nuevaCantidad);
+            }
+            await loadCart();
+        } catch {
+            const nuevoCarrito = nuevaCantidad === 0
+                ? carrito.filter((i) => !(i.id === id && i.size === size))
+                : carrito.map((i) => (i.id === id && i.size === size ? { ...i, cantidad: nuevaCantidad } : i));
+            setCarrito(nuevoCarrito);
+            saveLocalCart(nuevoCarrito);
+        }
     };
 
     const eliminarDelCarrito = (id, size) => cambiarCantidad(id, size, 0);
+
+
 
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
 
@@ -211,7 +277,7 @@ function App() {
                     
                     {/* Aquí renderizamos los primeros 4 productos usando tu base de datos simulada */}
                     <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        {productos.slice(0, 4).map(producto => (
+                        {(productos.filter((p) => p.destacado).length ? productos.filter((p) => p.destacado) : productos.slice(0, 4)).map(producto => (
                             <Producto 
                                 key={producto.id} 
                                 producto={producto} 
