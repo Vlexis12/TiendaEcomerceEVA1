@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { formatCLP, getProducts as getLocalProducts, saveProducts } from '../data/db';
 import { productService, adminService, authService, paymentService, contactService } from '../services/api';
+import { API_BASE } from '../services/api';
 import { getPurchases } from '../data/purchases';
 import ContactPage from './ContactPage';
 import './AdminApp.css';
@@ -29,6 +30,12 @@ function AdminApp() {
     const [checking, setChecking] = useState(true);
     const activeUserRole = session?.rol;
     const pathname = window.location.pathname;
+    const [now, setNow] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     useEffect(() => {
         let mounted = true;
@@ -76,21 +83,41 @@ function AdminApp() {
             : 'dashboard';
 
     return (
-        <AdminShell page={currentPage} session={session}>
+        <AdminShell page={currentPage} session={session} now={now}>
             {currentPage === 'users' && <UsersPage session={session} setSession={setSession} />}
             {currentPage === 'products' && <ProductsPage />}
             {currentPage === 'purchases' && <PurchasesPage />}
             {currentPage === 'contact' && <ContactPage />}
-            {currentPage === 'dashboard' && <DashboardPage session={session} />}
+            {currentPage === 'dashboard' && <DashboardPage session={session} now={now} />}
         </AdminShell>
     );
 }
 
-function AdminShell({ page, session, children }) {
+function AdminShell({ page, session, now, children }) {
     const logout = () => {
         localStorage.clear();
         window.location.assign('/login');
     };
+    const [photoUrl, setPhotoUrl] = useState(null);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    useEffect(() => {
+        const token = localStorage.getItem('sneakerx_jwt');
+        if (!token) return;
+        let mounted = true;
+        (async () => {
+            try {
+                const profile = await authService.getProfile();
+                if (profile?.id && mounted) {
+                    const res = await fetch(`${API_BASE}/user/usuarios/${profile.id}/foto`, { headers: { Authorization: `Bearer ${token}` } });
+                    if (res.ok) {
+                        const blob = await res.blob();
+                        if (mounted) setPhotoUrl(URL.createObjectURL(blob));
+                    }
+                }
+            } catch {}
+        })();
+        return () => { mounted = false; };
+    }, []);
 
     const links = [
         { key: 'dashboard', label: 'Dashboard', icon: '▦', href: adminPaths.dashboard },
@@ -102,15 +129,17 @@ function AdminShell({ page, session, children }) {
 
     return (
         <div data-admin-panel className="flex min-h-screen flex-col bg-[#f3f4f6] text-slate-900 antialiased lg:flex-row">
-            <aside className="flex w-full flex-col bg-[#111827] px-5 py-6 text-white lg:min-h-screen lg:w-72">
+            <aside className={`flex w-full flex-col bg-[#111827] px-5 py-6 text-white lg:min-h-screen transition-all ${sidebarOpen ? 'lg:w-64' : 'lg:w-0 lg:overflow-hidden lg:px-0 lg:py-0'}`}>
                 <a href={adminPaths.dashboard} className="flex items-center gap-3 px-3">
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-white text-lg font-black text-[#111827]">S</span>
                     <span><strong className="block text-lg tracking-tight">SneakerX</strong><small className="text-xs text-slate-400">ADMINISTRADOR</small></span>
                 </a>
                 <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-4">
                     <div className="flex items-center gap-3">
-                        <div className="grid h-11 w-11 place-items-center rounded-full bg-white font-bold text-[#111827]">{initials(session.nombre)}</div>
-                        <div><p className="font-semibold">{session.nombre}</p><p className="text-xs text-slate-400">Administrador</p></div>
+                        {photoUrl
+                            ? <img src={photoUrl} alt={session.nombre} className="h-11 w-11 rounded-full object-cover" />
+                            : <div className="grid h-11 w-11 place-items-center rounded-full bg-white font-bold text-[#111827]">{initials(session.nombre)}</div>}
+                        <div className="min-w-0"><p className="font-semibold truncate">{session.nombre}</p><p className="text-xs text-slate-400">Administrador</p></div>
                     </div>
                     <p className="mt-3 truncate text-xs text-slate-400">{session.email}</p>
                 </div>
@@ -130,7 +159,24 @@ function AdminShell({ page, session, children }) {
                     <button type="button" onClick={logout} className="text-sm text-slate-400 hover:text-white active:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Cerrar sesión</button>
                 </div>
             </aside>
-            <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+            <main className="min-w-0 flex-1 overflow-y-auto">
+                <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-4 backdrop-blur">
+                    <div className="flex items-center gap-3">
+                        <button type="button" onClick={() => setSidebarOpen((v) => !v)} className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200">
+                            {sidebarOpen ? '⟨ Ocultar' : '☰ Menú'}
+                        </button>
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{page}</p>
+                            <p className="text-sm font-semibold text-slate-700">Panel de administración</p>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-sm font-bold text-slate-900">{now.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                        <p className="text-xs text-slate-500">{now.toLocaleTimeString('es-CL')}</p>
+                    </div>
+                </header>
+                <div className="p-6">{children}</div>
+            </main>
         </div>
     );
 }
@@ -147,9 +193,12 @@ function PageHeader({ section, title, description, action }) {
     );
 }
 
-function DashboardPage({ session }) {
+function DashboardPage({ session, now }) {
     const [productCount, setProductCount] = useState(0);
     const [adminCount, setAdminCount] = useState(0);
+    const [salesMonth, setSalesMonth] = useState(0);
+    const [salesCount, setSalesCount] = useState(0);
+    const [ticketCount, setTicketCount] = useState(0);
     useEffect(() => {
         let mounted = true;
         productService.getPage({ page: 0, size: 1 }).then((data) => {
@@ -158,6 +207,21 @@ function DashboardPage({ session }) {
         adminService.listUsers().then((data) => {
             if (mounted) setAdminCount((Array.isArray(data) ? data : []).filter((u) => u.role === 'ADMIN' || u.role === 'Administrador').length);
         }).catch(() => { if (mounted) setAdminCount(getUsers().filter((u) => u.role === 'Administrador').length); });
+        paymentService.getAll().then((data) => {
+            if (!mounted) return;
+            const nowDate = new Date();
+            const month = nowDate.getMonth();
+            const year = nowDate.getFullYear();
+            const monthSales = (Array.isArray(data) ? data : []).filter((p) => {
+                const d = new Date(p.createdAt);
+                return d.getMonth() === month && d.getFullYear() === year;
+            });
+            setSalesCount(monthSales.length);
+            setSalesMonth(monthSales.reduce((sum, p) => sum + Number(p.total || 0), 0));
+        }).catch(() => {});
+        contactService.listTickets().then((data) => {
+            if (mounted) setTicketCount(Array.isArray(data) ? data.length : 0);
+        }).catch(() => {});
         return () => { mounted = false; };
     }, []);
     const products = productCount;
@@ -169,10 +233,11 @@ function DashboardPage({ session }) {
         <>
             <PageHeader section="Resumen" title={`${greeting}, ${firstName}`} description="Resumen de la actividad de tu tienda." action={<a href="/" target="_blank" rel="noreferrer" className={`admin-dark-action ${buttonClass}`}>Ver tienda</a>} />
             <div className="px-6 py-8 lg:px-10">
-                <section className="grid gap-4 sm:grid-cols-3" aria-label="Indicadores del negocio">
+                <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Indicadores del negocio">
+                    <Metric title="Ventas del mes" value={`$${Number(salesMonth).toLocaleString('es-CL')}`} detail={`${salesCount} boleta${salesCount === 1 ? '' : 's'}`} />
                     <Metric title="Productos publicados" value={products} detail="Catálogo sincronizado" />
                     <Metric title="Administradores" value={admins} detail="Perfiles con acceso" />
-                    <article className="rounded-2xl border border-slate-200 bg-slate-900 p-5 text-white shadow-sm"><p className="text-sm text-slate-400">Estado de la tienda</p><p className="mt-3 text-3xl font-bold">Activa</p><p className="mt-2 text-xs text-slate-400">Lista para recibir visitas</p></article>
+                    <Metric title="Tickets de soporte" value={ticketCount} detail="Solicitudes recibidas" />
                 </section>
                 <section className="mt-8 grid gap-6 xl:grid-cols-[1.4fr_1fr]">
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -180,6 +245,8 @@ function DashboardPage({ session }) {
                         <div className="mt-8 grid gap-4 sm:grid-cols-2">
                             <QuickLink href={adminPaths.products} icon="◇" title="Gestionar productos" description="Crea, edita o retira zapatillas del catálogo." />
                             <QuickLink href={adminPaths.users} icon="♙" title="Gestionar usuarios" description="Administra los accesos del equipo." />
+                            <QuickLink href={adminPaths.purchases} icon="▤" title="Ver compras" description="Historial de boletas y detalle." />
+                            <QuickLink href={adminPaths.contact} icon="✉" title="Soporte" description="Solicitudes y tickets." />
                         </div>
                     </div>
                     <div className="rounded-2xl bg-[#111827] p-6 text-white shadow-sm"><p className="text-sm text-slate-400">Acceso actual</p><h2 className="mt-2 break-all text-xl font-bold">{session.email}</h2><p className="mt-3 text-sm leading-6 text-slate-400">Tu cuenta tiene permisos para administrar el inventario y el equipo de SneakerX.</p><a href={adminPaths.users} className="admin-light-action mt-8 inline-flex rounded-xl bg-white px-4 py-3 text-sm font-semibold transition hover:bg-slate-200">Revisar usuarios →</a></div>
