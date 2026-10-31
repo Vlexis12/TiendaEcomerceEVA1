@@ -10,7 +10,10 @@ import Cuenta from './pages/Cuenta';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
 import Pago from './pages/Pago';
+import EditarPerfil from './pages/EditarPerfil';
+import MisCompras from './pages/MisCompras';
 import AdminApp from './admin/AdminApp';
+import ChatWidget from './components/ChatWidget';
 import Navbar from './components/Navbar';
 import './App.css'; // Mantenemos tu archivo CSS por si tienes algo ahí
 import Blogs from './pages/Blogs';
@@ -78,13 +81,18 @@ function App() {
             if (userId) {
                 data = await cartService.getCart(userId);
             } else {
-                data = await cartService.getGuestCart(sessionId);
+                try {
+                    data = await cartService.getGuestCart(sessionId);
+                } catch (e) {
+                    // 404 = carrito no existe aún, tratar como vacío
+                    data = { items: [] };
+                }
             }
             const items = (data?.items || []).map(mapCartItem);
             setCarrito(items);
             saveLocalCart(items);
         } catch {
-            setCarrito(getLocalCart());
+            setCarrito([]);
         }
     };
 
@@ -138,53 +146,114 @@ function App() {
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
 
     if (window.location.pathname.startsWith('/admin')) {
-        return <AdminApp />;
+        return (
+            <>
+                <AdminApp />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/mis-compras') {
+        if (!localStorage.getItem('sneakerx_jwt')) { window.location.replace('/login'); return null; }
+        return (
+            <>
+                <MisCompras totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/editar-perfil') {
+        if (!localStorage.getItem('sneakerx_jwt')) { window.location.replace('/login'); return null; }
+        return (
+            <>
+                <EditarPerfil />
+                <ChatWidget />
+            </>
+        );
     }
 
     if (window.location.pathname === '/productos') {
         return (
-            <Productos
-                productos={productos}
-                carrito={carrito}
-                onAgregarCarrito={agregarAlCarrito}
-                onCambiarCantidad={cambiarCantidad}
-                onEliminarProducto={eliminarDelCarrito}
-            />
+            <>
+                <Productos
+                    productos={productos}
+                    carrito={carrito}
+                    onAgregarCarrito={agregarAlCarrito}
+                    onCambiarCantidad={cambiarCantidad}
+                    onEliminarProducto={eliminarDelCarrito}
+                />
+                <ChatWidget />
+            </>
         );
     }
 
     if (window.location.pathname === '/carrito') {
         return (
-            <Carrito
-                carrito={carrito}
-                onCambiarCantidad={cambiarCantidad}
-                onEliminarProducto={eliminarDelCarrito}
-            />
+            <>
+                <Carrito
+                    carrito={carrito}
+                    onCambiarCantidad={cambiarCantidad}
+                    onEliminarProducto={eliminarDelCarrito}
+                />
+                <ChatWidget />
+            </>
         );
     }
 
     if (window.location.pathname === '/nosotros') {
-        return <Nosotros totalItems={totalItems} />;
+        return (
+            <>
+                <Nosotros totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
     }
 
     if (window.location.pathname === '/contacto') {
-        return <Contacto totalItems={totalItems} />;
+        return (
+            <>
+                <Contacto totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
     }
 
     if (window.location.pathname === '/cuenta') {
-        return <Cuenta totalItems={totalItems} />;
+        return (
+            <>
+                <Cuenta totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
     }
 
     if (window.location.pathname === '/login') {
-        return <Login totalItems={totalItems} />;
+        return (
+            <>
+                <Login totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
     }
 
     if (window.location.pathname === '/registro') {
-        return <Registro totalItems={totalItems} />;
+        return (
+            <>
+                <Registro totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
     }
 
     if (window.location.pathname === '/pago') {
-        return <Pago carrito={carrito} onPagoCompletado={() => { setCarrito([]); saveCart([]); }} />;
+        return (
+            <>
+                <Pago carrito={carrito} onPagoCompletado={() => { setCarrito([]); saveLocalCart([]); }} />
+                <ChatWidget />
+            </>
+        );
     }
 
     if (window.location.pathname === '/blog') {
@@ -194,6 +263,7 @@ function App() {
                 <main>
                     <Blogs />
                 </main>
+                <ChatWidget />
             </div>
         );
     }
@@ -207,6 +277,7 @@ function App() {
                     {}
                     <BlogDetail id={blogId} /> 
                 </main>
+                <ChatWidget />
             </div>
         );
     }
@@ -299,6 +370,7 @@ function App() {
                     </div>
                 </div>
             </footer>
+            <ChatWidget />
         </div>
     );
 }

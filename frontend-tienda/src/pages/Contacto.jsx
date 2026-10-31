@@ -1,19 +1,31 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
+import { contactService } from '../services/api';
 
 function Contacto({ totalItems = 0 }) {
     const [enviado, setEnviado] = useState(false);
     const [mensaje, setMensaje] = useState('');
+    const [nombre, setNombre] = useState('');
+    const [email, setEmail] = useState('');
+    const [asunto, setAsunto] = useState('');
+    const [error, setError] = useState('');
 
     const actualizarMensaje = (event) => {
         setMensaje(event.target.value.slice(0, 200));
     };
 
-    const enviarFormulario = (event) => {
+    const enviarFormulario = async (event) => {
         event.preventDefault();
-        event.currentTarget.reset();
-        setMensaje('');
+        setError('');
         setEnviado(true);
+        try {
+            await contactService.sendContact({ nombre, email, asunto, mensaje });
+            event.currentTarget.reset();
+            setNombre(''); setEmail(''); setAsunto(''); setMensaje('');
+        } catch (e) {
+            setEnviado(false);
+            setError(e.message || 'No se pudo enviar el mensaje.');
+        }
     };
 
     return (
@@ -40,11 +52,11 @@ function Contacto({ totalItems = 0 }) {
                             <div className="mt-4 grid gap-5 sm:grid-cols-2">
                                 <label className="block text-sm font-semibold text-slate-700">
                                     Nombre
-                                    <input type="text" required placeholder="Tu nombre" className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" />
+                                    <input type="text" required value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Tu nombre" className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" />
                                 </label>
                                 <label className="block text-sm font-semibold text-slate-700">
                                     Correo electrónico
-                                    <input type="email" required placeholder="tu@correo.com" className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" />
+                                    <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" />
                                 </label>
                             </div>
                         </div>
@@ -53,7 +65,7 @@ function Contacto({ totalItems = 0 }) {
                             <div className="mt-4" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                 <label style={{ display: 'block', width: '100%' }} className="text-sm font-semibold text-slate-700">
                                     Asunto
-                                    <input type="text" required placeholder="¿En qué podemos ayudarte?" className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" />
+                                    <input type="text" required value={asunto} onChange={(e) => setAsunto(e.target.value)} placeholder="¿En qué podemos ayudarte?" className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" />
                                 </label>
                                 <label style={{ display: 'block', width: '100%' }} className="text-sm font-semibold text-slate-700">
                                     Mensaje

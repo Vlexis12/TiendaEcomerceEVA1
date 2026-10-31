@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { formatCLP, getProducts as getLocalProducts, saveProducts } from '../data/db';
-import { productService, adminService, authService } from '../services/api';
+import { productService, adminService, authService, paymentService, contactService } from '../services/api';
 import { getPurchases } from '../data/purchases';
+import ContactPage from './ContactPage';
 import './AdminApp.css';
 import {
     createAdminEmail,
@@ -17,6 +18,7 @@ const adminPaths = {
     users: '/admin/usuarios',
     products: '/admin/productos',
     purchases: '/admin/compras',
+    contact: '/admin/contacto',
 };
 
 const inputClass = 'w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100';
@@ -69,6 +71,8 @@ function AdminApp() {
             ? 'products'
             : pathname === '/admin/compras'
                 ? 'purchases'
+                : pathname === '/admin/contacto'
+                    ? 'contact'
             : 'dashboard';
 
     return (
@@ -76,6 +80,7 @@ function AdminApp() {
             {currentPage === 'users' && <UsersPage session={session} setSession={setSession} />}
             {currentPage === 'products' && <ProductsPage />}
             {currentPage === 'purchases' && <PurchasesPage />}
+            {currentPage === 'contact' && <ContactPage />}
             {currentPage === 'dashboard' && <DashboardPage session={session} />}
         </AdminShell>
     );
@@ -83,7 +88,7 @@ function AdminApp() {
 
 function AdminShell({ page, session, children }) {
     const logout = () => {
-        localStorage.removeItem('usuarioLogueado');
+        localStorage.clear();
         window.location.assign('/login');
     };
 
@@ -92,6 +97,7 @@ function AdminShell({ page, session, children }) {
         { key: 'users', label: 'Usuarios', icon: '♙', href: adminPaths.users },
         { key: 'products', label: 'Productos', icon: '◇', href: adminPaths.products },
         { key: 'purchases', label: 'Compras', icon: '▤', href: adminPaths.purchases },
+        { key: 'contact', label: 'Contacto', icon: '✉', href: adminPaths.contact },
     ];
 
     return (
@@ -192,32 +198,88 @@ function QuickLink({ href, icon, title, description }) {
 }
 
 function PurchasesPage() {
-    const [purchases] = useState(() => getPurchases());
+    const [purchases, setPurchases] = useState(() => getPurchases());
+    const [loading, setLoading] = useState(false);
     const [selectedPurchase, setSelectedPurchase] = useState(null);
+    const [page, setPage] = useState(0);
+    const pageSize = 5;
+    const totalPages = Math.max(1, Math.ceil(purchases.length / pageSize));
+    const pageItems = purchases.slice(page * pageSize, page * pageSize + pageSize);
+
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            try {
+                const data = await paymentService.getAll();
+                if (!mounted) return;
+                const mapped = (data || []).map((p) => {
+                    const total = Number(p.total || 0);
+                    const subtotal = Math.round(total / 1.19);
+                    const tax = total - subtotal;
+                    return {
+                        receiptNumber: p.receiptNumber || `#${p.id}`,
+                        purchasedAt: p.createdAt,
+                        buyer: { name: p.buyerName || p.deliveryName || '', email: p.buyerEmail || '' },
+                        delivery: {
+                            name: p.deliveryName || '',
+                            address: p.deliveryAddress || '',
+                            phone: p.deliveryPhone || '',
+                            rut: p.deliveryRut || '',
+                            notes: p.deliveryNotes || '',
+                        },
+                        paymentMethod: p.metodoPago || '',
+                        items: (p.items || []).map((it) => ({
+                            id: it.productoId,
+                            name: it.nombre,
+                            size: it.talla,
+                            quantity: it.cantidad,
+                            price: Number(it.precioUnitario || 0),
+                            image: it.imagenUrl || '',
+                        })),
+                        subtotal,
+                        tax,
+                        total,
+                    };
+                });
+                setPurchases(mapped);
+            } catch (e) {
+                console.error('Error cargando compras:', e);
+                setPurchases(getPurchases());
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        })();
+        return () => { mounted = false; };
+    }, []);
 
     return (
         <>
             <PageHeader section="Ventas" title="Historial de compras" description="Compras realizadas por clientes, con su boleta y detalle." />
             <div className="px-6 py-8 lg:px-10">
                 <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    <div className="border-b border-slate-200 p-5"><h2 className="font-bold">Compras registradas</h2><p className="mt-1 text-sm text-slate-500">{purchases.length} boleta{purchases.length === 1 ? '' : 's'} guardada{purchases.length === 1 ? '' : 's'} en este navegador.</p></div>
+                    <div className="border-b border-slate-200 p-5"><h2 className="font-bold">Compras registradas</h2><p className="mt-1 text-sm text-slate-500">{loading ? 'Cargando...' : `${purchases.length} boleta${purchases.length === 1 ? '' : 's'} guardada${purchases.length === 1 ? '' : 's'} en el sistema.`}</p></div>
                     <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left">
                         <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th className="px-5 py-4">Boleta</th><th className="px-5 py-4">Fecha</th><th className="px-5 py-4">Comprador</th><th className="px-5 py-4">Productos</th><th className="px-5 py-4">Total</th><th className="px-5 py-4 text-right">Detalle</th></tr></thead>
                         <tbody className="divide-y divide-slate-100">
-                            {purchases.length === 0
-                                ? <tr><td colSpan="6" className="px-5 py-12 text-center text-sm text-slate-500">Aún no hay compras registradas.</td></tr>
-                                : purchases.map((purchase) => <tr key={purchase.receiptNumber} className="hover:bg-slate-50"><td className="px-5 py-4 text-sm font-semibold">{purchase.receiptNumber}</td><td className="px-5 py-4 text-sm text-slate-500">{formatPurchaseDate(purchase.purchasedAt)}</td><td className="px-5 py-4"><p className="font-semibold">{purchase.buyer.name}</p><p className="text-sm text-slate-500">{purchase.buyer.email}</p></td><td className="px-5 py-4 text-sm">{purchase.items.reduce((sum, item) => sum + item.quantity, 0)}</td><td className="px-5 py-4 font-semibold">{formatCLP(purchase.total)}</td><td className="px-5 py-4 text-right"><button type="button" onClick={() => setSelectedPurchase(purchase)} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 active:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500">Ver boleta</button></td></tr>)}
+                            {loading
+                                ? <tr><td colSpan="6" className="px-5 py-12 text-center text-sm text-slate-500">Cargando compras...</td></tr>
+                                : purchases.length === 0
+                                    ? <tr><td colSpan="6" className="px-5 py-12 text-center text-sm text-slate-500">Aún no hay compras registradas.</td></tr>
+                                    : pageItems.map((purchase) => <tr key={purchase.receiptNumber} className="hover:bg-slate-50"><td className="px-5 py-4 text-sm font-semibold">{purchase.receiptNumber}</td><td className="px-5 py-4 text-sm text-slate-500">{formatPurchaseDate(purchase.purchasedAt)}</td><td className="px-5 py-4"><p className="font-semibold">{purchase.buyer.name}</p><p className="text-sm text-slate-500">{purchase.buyer.email}</p></td><td className="px-5 py-4 text-sm">{purchase.items.reduce((sum, item) => sum + item.quantity, 0)}</td><td className="px-5 py-4 font-semibold">{formatCLP(purchase.total)}</td><td className="px-5 py-4 text-right"><button type="button" onClick={() => setSelectedPurchase(purchase)} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 active:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500">Ver boleta</button></td></tr>)}
                         </tbody>
                     </table></div>
+                    {!loading && purchases.length > pageSize && <div className="flex items-center justify-between border-t border-slate-200 bg-white px-5 py-4"><button type="button" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-40">← Anterior</button><span className="text-sm text-slate-500">Página {page + 1} de {totalPages}</span><button type="button" onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-40">Siguiente →</button></div>}
                 </section>
             </div>
             {selectedPurchase && <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/60 px-4 py-8" role="dialog" aria-modal="true" aria-labelledby="purchase-receipt-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPurchase(null); }}>
                 <article className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
                     <div className="flex items-start justify-between gap-4"><div><p className="text-sm font-medium text-slate-500">Comprobante de compra</p><h2 id="purchase-receipt-title" className="mt-1 text-2xl font-bold">{selectedPurchase.receiptNumber}</h2></div><button type="button" onClick={() => setSelectedPurchase(null)} aria-label="Cerrar boleta" className="text-2xl leading-none text-slate-400 hover:text-slate-900">×</button></div>
                     <p className="mt-2 text-sm text-slate-500">{formatPurchaseDate(selectedPurchase.purchasedAt)}</p>
-                    <div className="mt-6 grid gap-2 rounded-xl bg-slate-50 p-4 text-sm sm:grid-cols-2"><p><b>Comprador:</b> {selectedPurchase.buyer.name}</p><p><b>Correo:</b> {selectedPurchase.buyer.email}</p><p><b>Entrega:</b> {selectedPurchase.delivery.address}</p><p><b>Teléfono:</b> {selectedPurchase.delivery.phone}</p><p><b>Pago:</b> {selectedPurchase.paymentMethod}</p></div>
+                    <div className="mt-6 grid gap-2 rounded-xl bg-slate-50 p-4 text-sm sm:grid-cols-2"><p><b>Comprador:</b> {selectedPurchase.buyer.name}</p><p><b>Correo:</b> {selectedPurchase.buyer.email}</p><p><b>RUT:</b> {selectedPurchase.delivery.rut || '—'}</p><p><b>Entrega:</b> {selectedPurchase.delivery.address}</p><p><b>Teléfono:</b> {selectedPurchase.delivery.phone}</p><p><b>Pago:</b> {selectedPurchase.paymentMethod}</p>{selectedPurchase.delivery.notes && <p><b>Notas:</b> {selectedPurchase.delivery.notes}</p>}</div>
                     <h3 className="mt-6 font-bold">Detalle de productos</h3>
-                    <ul className="mt-3 divide-y divide-slate-100">{selectedPurchase.items.map((item, index) => <li key={`${item.id}-${item.size}-${index}`} className="flex justify-between gap-4 py-3 text-sm"><span>{item.name} · Talla {item.size} × {item.quantity}</span><span className="font-semibold">{formatCLP(item.price * item.quantity)}</span></li>)}</ul>
+                    {selectedPurchase.items.length === 0
+                        ? <p className="mt-3 text-sm text-slate-500">Sin detalle de productos.</p>
+                        : <ul className="mt-3 divide-y divide-slate-100">{selectedPurchase.items.map((item, index) => <li key={`${item.id}-${item.size}-${index}`} className="flex justify-between gap-4 py-3 text-sm"><span>{item.name} · Talla {item.size} × {item.quantity}</span><span className="font-semibold">{formatCLP(item.price * item.quantity)}</span></li>)}</ul>}
                     <dl className="mt-4 space-y-2 border-t border-slate-200 pt-4 text-sm"><div className="flex justify-between"><dt>Subtotal</dt><dd>{formatCLP(selectedPurchase.subtotal)}</dd></div><div className="flex justify-between"><dt>IVA</dt><dd>{formatCLP(selectedPurchase.tax)}</dd></div><div className="flex justify-between border-t border-slate-200 pt-3 text-base font-bold"><dt>Total</dt><dd>{formatCLP(selectedPurchase.total)}</dd></div></dl>
                 </article>
             </div>}

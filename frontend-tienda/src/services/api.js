@@ -1,4 +1,4 @@
-export const API_BASE = 'http://localhost:8082/api/v1/sneakerx';
+export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8082/api/v1/sneakerx';
 
 const friendlyFetch = async (url, options) => {
   try {
@@ -106,6 +106,58 @@ export const authService = {
     const role = usuario?.role ?? data?.role ?? null;
     if (role) localStorage.setItem('sneakerx_role', role);
     if (usuario) localStorage.setItem('sneakerx_user', JSON.stringify(usuario));
+    return data;
+  },
+  googleLogin: async (credential) => {
+    const response = await friendlyFetch(`${API_BASE}/user/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential }),
+    });
+    await ensureOk(response);
+    const data = await parseResponse(response);
+    const usuario = data?.usuario || data?.user || null;
+    const token = data?.token || data?.accessToken || null;
+    if (token) localStorage.setItem('sneakerx_jwt', token);
+    const userId = usuario?.id ?? data?.userId ?? data?.id ?? null;
+    if (userId != null) localStorage.setItem('sneakerx_userId', String(userId));
+    const uname = usuario?.username ?? data?.username ?? '';
+    if (uname) localStorage.setItem('sneakerx_username', uname);
+    const role = usuario?.role ?? data?.role ?? null;
+    if (role) localStorage.setItem('sneakerx_role', role);
+    if (usuario) localStorage.setItem('sneakerx_user', JSON.stringify(usuario));
+    const userData = {
+      nombre: uname,
+      email: usuario?.email || '',
+      rol: (role === 'ADMIN') ? 'admin' : 'usuario',
+    };
+    localStorage.setItem('usuarioLogueado', JSON.stringify(userData));
+    return data;
+  },
+  googleRegister: async (credential) => {
+    const response = await friendlyFetch(`${API_BASE}/user/auth/google/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential }),
+    });
+    await ensureOk(response);
+    const data = await parseResponse(response);
+    const usuario = data?.usuario || data?.user || null;
+    const token = data?.token || data?.accessToken || null;
+    if (token) localStorage.setItem('sneakerx_jwt', token);
+    const userId = usuario?.id ?? data?.userId ?? data?.id ?? null;
+    if (userId != null) localStorage.setItem('sneakerx_userId', String(userId));
+    const uname = usuario?.username ?? data?.username ?? '';
+    if (uname) localStorage.setItem('sneakerx_username', uname);
+    const role = usuario?.role ?? data?.role ?? null;
+    if (role) localStorage.setItem('sneakerx_role', role);
+    if (usuario) localStorage.setItem('sneakerx_user', JSON.stringify(usuario));
+    const userData = {
+      nombre: uname,
+      email: usuario?.email || '',
+      rol: (role === 'ADMIN') ? 'admin' : 'usuario',
+    };
+    localStorage.setItem('usuarioLogueado', JSON.stringify(userData));
     return data;
   },
   getProfile: async () => {
@@ -367,6 +419,98 @@ export const cartService = {
     const cart = await parseResponse(response);
     clearSessionId();
     return cart;
+  },
+};
+
+export const contactService = {
+  sendContact: async (data) => {
+    const response = await friendlyFetch(`${API_BASE}/contacto/contacto`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    await ensureOk(response);
+    return parseResponse(response);
+  },
+  listContacts: async () => {
+    const response = await friendlyFetch(`${API_BASE}/contacto/contacto`, { headers: getAuthHeaders() });
+    await ensureOk(response);
+    const data = await parseResponse(response);
+    return Array.isArray(data) ? data : [];
+  },
+  createTicket: async (data) => {
+    const response = await friendlyFetch(`${API_BASE}/contacto/tickets`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    await ensureOk(response);
+    return parseResponse(response);
+  },
+  listTickets: async () => {
+    const response = await friendlyFetch(`${API_BASE}/contacto/tickets`, { headers: getAuthHeaders() });
+    await ensureOk(response);
+    const data = await parseResponse(response);
+    return Array.isArray(data) ? data : [];
+  },
+  getMessages: async (ticketId) => {
+    const response = await friendlyFetch(`${API_BASE}/contacto/tickets/${ticketId}/messages`, { headers: getAuthHeaders() });
+    await ensureOk(response);
+    const data = await parseResponse(response);
+    return Array.isArray(data) ? data : [];
+  },
+  chatIA: async (data) => {
+    const response = await friendlyFetch(`${API_BASE}/contacto/ia`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    await ensureOk(response);
+    return parseResponse(response);
+  },
+  closeTicket: async (ticketId) => {
+    const response = await friendlyFetch(`${API_BASE}/contacto/tickets/${ticketId}/cerrar`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    });
+    await ensureOk(response);
+    return parseResponse(response);
+  },
+  sendMessage: async (ticketId, data) => {
+    const response = await friendlyFetch(`${API_BASE}/contacto/tickets/${ticketId}/messages`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    await ensureOk(response);
+    return parseResponse(response);
+  },
+};
+export const paymentService = {
+  createPayment: async (data) => {
+    const response = await friendlyFetch(`${API_BASE}/pago/pagos`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    await ensureOk(response);
+    return parseResponse(response);
+  },
+  getHistorial: async (usuarioId) => {
+    const response = await friendlyFetch(`${API_BASE}/pago/pagos/usuario/${usuarioId}`, {
+      headers: getAuthHeaders(),
+    });
+    await ensureOk(response);
+    const data = await parseResponse(response);
+    return Array.isArray(data) ? data : [];
+  },
+  getAll: async () => {
+    const response = await friendlyFetch(`${API_BASE}/pago/pagos`, {
+      headers: getAuthHeaders(),
+    });
+    await ensureOk(response);
+    const data = await parseResponse(response);
+    return Array.isArray(data) ? data : [];
   },
 };
 

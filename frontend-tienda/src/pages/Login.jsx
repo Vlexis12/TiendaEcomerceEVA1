@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import { authService, cartService, getSessionId, clearSessionId } from '../services/api';
 
@@ -7,6 +7,36 @@ function Login({ totalItems = 0 }) {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
+    useEffect(() => {
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+        const init = () => {
+            if (!window.google || window.__gsi_initialized) return;
+            window.__gsi_initialized = true;
+            window.google.accounts.id.initialize({
+                client_id: clientId,
+                callback: async (response) => {
+                    try {
+                        await authService.googleLogin(response.credential);
+                        window.location.href = '/';
+                    } catch (err) {
+                        setError(err.message || 'No se pudo iniciar sesión con Google.');
+                    }
+                },
+            });
+            const btn = document.getElementById('google-btn');
+            if (btn) window.google.accounts.id.renderButton(btn, { theme: 'outline', size: 'large', width: 320 });
+        };
+        if (!window.google) {
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            script.defer = true;
+            script.onload = init;
+            document.head.appendChild(script);
+        } else {
+            init();
+        }
+    }, []);
     const iniciarSesion = async (event) => {
         event.preventDefault();
         setError('');
@@ -22,7 +52,7 @@ function Login({ totalItems = 0 }) {
             const sid = getSessionId();
             const uid = localStorage.getItem('sneakerx_userId');
             if (sid && uid) {
-                try { await cartService.transferCart(sid, uid); } catch {}
+                try { console.log('Transferring cart', sid, uid); await cartService.transferCart(sid, uid); console.log('Cart transferred'); } catch (e) { console.error('Transfer failed:', e); }
                 clearSessionId();
             }
             window.location.href = userData.rol === 'admin' ? '/admin' : '/';
@@ -54,6 +84,7 @@ function Login({ totalItems = 0 }) {
                         <form onSubmit={iniciarSesion} className="mt-8 space-y-5">
                             <label className="block text-sm font-semibold text-slate-700">Usuario o correo electrónico<input type="text" required value={username} onChange={(event) => setUsername(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="usuario o correo" /></label>
                             <label className="block text-sm font-semibold text-slate-700">Contraseña<input type="password" required value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100" placeholder="Ingresa tu contraseña" /></label>
+                            <div id="google-btn" className="mt-2 flex justify-center"></div>
                             <button type="submit" className="btn btn-dark w-100 py-3">Iniciar sesión <span className="ml-2">→</span></button>
                         </form>
                         <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-6 text-sm"><a href="/registro" className="font-semibold text-slate-900 hover:underline">Crear una cuenta</a><a href="/" className="text-slate-500 transition hover:text-slate-900">Volver al inicio</a></div>

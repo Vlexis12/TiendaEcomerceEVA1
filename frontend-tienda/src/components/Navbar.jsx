@@ -1,9 +1,53 @@
 // src/components/Navbar.jsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getSession } from '../data/users';
+import { authService } from '../services/api';
+import { API_BASE } from '../services/api';
 
 const Navbar = ({ totalItems, activePath }) => {
     const [session, setSession] = useState(() => getSession());
+    const [user, setUser] = useState(() => { try { return JSON.parse(localStorage.getItem('sneakerx_user') || 'null'); } catch { return null; } });
+    const [imgError, setImgError] = useState(false);
+const [photoBlobUrl, setPhotoBlobUrl] = useState(null);
+
+    useEffect(() => {
+        const refresh = () => { try { setUser(JSON.parse(localStorage.getItem('sneakerx_user') || 'null')); setImgError(false); } catch { setUser(null); } };
+        refresh();
+        // Fetch fresh profile to get imagenUrl (Google photo) only if logged in
+        if (localStorage.getItem('sneakerx_jwt')) {
+            (async () => {
+                try {
+                    const profile = await authService.getProfile();
+                    if (profile) {
+                        const u = { ...profile, imagenUrl: profile.imagenUrl || profile.picture };
+                        localStorage.setItem('sneakerx_user', JSON.stringify(u));
+                        setUser(u);
+                        setImgError(false);
+                    }
+                    // Cargar foto a través del proxy autenticado
+                    if (profile?.id) {
+                        try {
+                            const token = localStorage.getItem('sneakerx_jwt');
+                            const res = await fetch(`${API_BASE}/user/usuarios/${profile.id}/foto`, {
+                                headers: token ? { Authorization: `Bearer ${token}` } : {},
+                            });
+                            if (res.ok) {
+                                const blob = await res.blob();
+                                const url = URL.createObjectURL(blob);
+                                setPhotoBlobUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url; });
+                            } else {
+                                setPhotoBlobUrl(null);
+                            }
+                        } catch {
+                            setPhotoBlobUrl(null);
+                        }
+                    }
+                } catch {}
+            })();
+        }
+        window.addEventListener('storage', refresh);
+        return () => window.removeEventListener('storage', refresh);
+    }, []);
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState(() => new URLSearchParams(window.location.search).get('buscar') || '');
 
@@ -18,8 +62,9 @@ const Navbar = ({ totalItems, activePath }) => {
     ];
 
     const cerrarSesion = () => {
-        localStorage.removeItem('usuarioLogueado');
+        localStorage.clear();
         setSession(null);
+        setUser(null);
         setAccountMenuOpen(false);
         window.location.href = '/';
     };
@@ -66,16 +111,26 @@ const Navbar = ({ totalItems, activePath }) => {
                                     aria-label={`Abrir menú de ${session.nombre}`}
                                     aria-expanded={accountMenuOpen}
                                     onClick={() => setAccountMenuOpen((isOpen) => !isOpen)}
-                                    className="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-200"
+                                    className="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-200"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004C12.9 12.1 12.2 10 8 10c-4.2 0-4.9 2.1-5 2.996h10Z"/>
-                                    </svg>
+                                    {photoBlobUrl && !imgError ? (
+                                        <img src={photoBlobUrl} alt={session.nombre} className="h-full w-full object-cover" onError={() => setImgError(true)} />
+                                    ) : (
+                                        <span className="text-sm font-bold">
+                                            {(session.nombre || '').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'U'}
+                                        </span>
+                                    )}
                                 </button>
                                 {accountMenuOpen && (
                                     <div className="absolute right-0 top-12 z-50 min-w-48 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
                                         <p className="truncate px-3 py-2 text-sm font-semibold text-slate-700">{session.nombre}</p>
                                         <div className="flex flex-col gap-1">
+                                            <a
+                                                href="/mis-compras"
+                                                className="rounded-lg px-3 py-2 text-center text-xs font-semibold text-slate-900 transition hover:bg-slate-100"
+                                            >
+                                                Mis compras
+                                            </a>
                                             {session.rol === 'admin' && (
                                                 <a
                                                     href="/admin"
@@ -84,6 +139,12 @@ const Navbar = ({ totalItems, activePath }) => {
                                                     Ir al panel de admin
                                                 </a>
                                             )}
+                                            <a
+                                                href="/editar-perfil"
+                                                className="rounded-lg px-3 py-2 text-center text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                                            >
+                                                Editar perfil
+                                            </a>
                                             <button
                                                 type="button"
                                                 onClick={cerrarSesion}
