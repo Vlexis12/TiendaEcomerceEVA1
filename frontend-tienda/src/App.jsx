@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getProducts as getLocalProducts, getCart as getLocalCart, saveCart as saveLocalCart } from './data/db';
 import { productService, cartService, getOrCreateSessionId, getSessionId } from './services/api';
 import { Producto } from './components/Producto';
+import HeroCarousel from './components/HeroCarousel';
 import Productos from './pages/Productos';
 import Carrito from './pages/Carrito';
 import Nosotros from './pages/Nosotros';
@@ -14,6 +15,7 @@ import EditarPerfil from './pages/EditarPerfil';
 import MisCompras from './pages/MisCompras';
 import AdminApp from './admin/AdminApp';
 import ChatWidget from './components/ChatWidget';
+import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import './App.css'; // Mantenemos tu archivo CSS por si tienes algo ahí
 import Blogs from './pages/Blogs';
@@ -45,6 +47,7 @@ function App() {
                     category: p.categoria || p.category || '',
                     stock: p.stock,
                     destacado: p.destacado === true,
+                    enCarrusel: p.enCarrusel === true,
                 }));
                 setProductos(mapped);
             })
@@ -309,35 +312,10 @@ function App() {
 
             {/* Contenido Principal */}
             <main>
-                {/* Sección Hero (Imagen destacada) */}
-                <section className="px-3 py-3 sm:py-4 lg:px-4 lg:py-5" aria-label="Colección destacada">
-                    <div className="relative mx-auto max-w-[96rem] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                        <div className="relative h-[245px] sm:h-[275px] lg:h-[300px]">
-                        <img
-                            src={coleccion.images[imagenDestacada]}
-                            alt={coleccion.title}
-                            className="absolute right-0 top-0 z-10 h-full w-[52%] object-contain object-center mix-blend-multiply sm:w-[55%] lg:w-[57%]"
-                        />
-                        
-                        <div className="relative z-20 mx-auto flex h-full max-w-[96rem] items-center px-6 sm:px-10 lg:px-14">
-                            <div className="max-w-lg text-slate-900">
-                                <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-500 sm:text-xs">Nueva selección / 2026</p>
-                                <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">{coleccion.title}</h1>
-                                <p className="mt-3 max-w-lg text-xs leading-6 text-slate-600 sm:text-sm">{coleccion.description}</p>
-                                <div className="mt-4 flex flex-wrap items-center gap-3">
-                                    <a href="/productos" className="inline-flex items-center rounded-xl bg-[#111827] px-5 py-3 text-xs font-bold text-white no-underline shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-slate-700 sm:text-sm">{coleccion.buttonText}<span className="ml-2 text-base" aria-hidden="true">→</span></a>
-                                    <div className="flex items-center gap-3" aria-label="Cambiar colección">
-                                        {destacados.map((item, index) => <button key={item.title} type="button" onClick={() => setDestacado(index)} aria-label={`Mostrar ${item.title}`} className={`h-2 w-2 rounded-full transition ${index === destacado ? 'bg-[#111827] ring-2 ring-[#111827] ring-offset-2 ring-offset-white' : 'bg-slate-300 hover:bg-slate-700'}`} />)}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                </section>
+                <HeroCarousel />
 
                 {/* Sección Más Vendidas */}
-                <section className="mx-auto max-w-[96rem] px-4 py-7 lg:px-6 lg:py-9" aria-labelledby="bestsellers-title">
+                <section className="mx-auto max-w-[96rem] px-4 py-4 lg:px-6 lg:py-6" aria-labelledby="bestsellers-title">
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Lo que todos están usando</p>
@@ -347,7 +325,7 @@ function App() {
                     </div>
                     
                     {/* Aquí renderizamos los primeros 4 productos usando tu base de datos simulada */}
-                    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="mt-2 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                         {(productos.filter((p) => p.destacado).length ? productos.filter((p) => p.destacado) : productos.slice(0, 4)).map(producto => (
                             <Producto 
                                 key={producto.id} 
@@ -359,17 +337,6 @@ function App() {
                 </section>
             </main>
 
-            {/* Footer */}
-            <footer className="bg-[#111827] px-6 py-8 text-slate-400 lg:px-8">
-                <div className="mx-auto flex max-w-7xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-                    <p>© 2026 SneakerX. Hecho para moverte.</p>
-                    <div className="flex gap-5">
-                        <a href="/nosotros" className="no-underline transition hover:text-white">Nosotros</a>
-                        <a href="/productos" className="no-underline transition hover:text-white">Catálogo</a>
-                        <a href="/cuenta" className="no-underline transition hover:text-white">Mi cuenta</a>
-                    </div>
-                </div>
-            </footer>
             <ChatWidget />
         </div>
     );

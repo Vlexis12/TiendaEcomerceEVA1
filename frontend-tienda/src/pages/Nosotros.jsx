@@ -44,9 +44,6 @@ function Nosotros({ totalItems = 0 }) {
                 </section>
             </main>
 
-            <footer className="bg-[#111827] px-6 py-8 text-slate-400 lg:px-8">
-                <div className="mx-auto flex max-w-7xl justify-between text-sm"><p>© 2026 SneakerX.</p><a href="/" className="transition hover:text-white">Volver al inicio</a></div>
-            </footer>
         </div>
     );
 }

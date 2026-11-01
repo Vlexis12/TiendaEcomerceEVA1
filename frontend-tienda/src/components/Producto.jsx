@@ -10,8 +10,11 @@ export const Producto = ({ producto, onAgregarCarrito }) => {
         <article className="group overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg">
             <div className="relative h-56 overflow-hidden rounded-t-3xl bg-slate-100">
                 <img src={producto.image} alt={producto.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                {agotado && (
+                {stock <= 0 && (
                     <span className="absolute left-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">AGOTADO</span>
+                )}
+                {stock > 0 && stock < 10 && (
+                    <span className="absolute left-3 top-3 rounded-full bg-yellow-400 px-3 py-1 text-xs font-bold text-yellow-900">ÚLTIMAS UNIDADES</span>
                 )}
             </div>
             <div className="flex min-h-[230px] flex-col p-5">

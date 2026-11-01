@@ -149,12 +149,6 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                 </div>
             </div>
 
-            <footer className="bg-[#111827] px-6 py-8 text-slate-400 lg:px-8">
-                <div className="mx-auto flex max-w-[100rem] flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-                    <p>© 2026 SneakerX. Hecho para moverte.</p>
-                    <a href="/" className="transition hover:text-white">Volver al inicio</a>
-                </div>
-            </footer>
         </div>
     );
 }
