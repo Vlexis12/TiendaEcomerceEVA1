@@ -1,0 +1,345 @@
+import { useEffect, useState } from 'react';
+import { getProducts as getLocalProducts, getCart as getLocalCart, saveCart as saveLocalCart } from './data/db';
+import { productService, cartService, getOrCreateSessionId, getSessionId } from './services/api';
+import { Producto } from './components/Producto';
+import HeroCarousel from './components/HeroCarousel';
+import Productos from './pages/Productos';
+import Carrito from './pages/Carrito';
+import Nosotros from './pages/Nosotros';
+import Contacto from './pages/Contacto';
+import Cuenta from './pages/Cuenta';
+import Login from './pages/Login';
+import Registro from './pages/Registro';
+import Pago from './pages/Pago';
+import EditarPerfil from './pages/EditarPerfil';
+import MisCompras from './pages/MisCompras';
+import AdminApp from './admin/AdminApp';
+import ChatWidget from './components/ChatWidget';
+import Footer from './components/Footer';
+import Navbar from './components/Navbar';
+import './App.css'; // Mantenemos tu archivo CSS por si tienes algo ahí
+import Blogs from './pages/Blogs';
+import BlogDetail from './pages/BlogDetail';
+
+const destacados = [
+    { title: 'Nike Air Force 1', description: 'El clásico que siempre encuentra una nueva forma de destacar.', buttonText: 'Compra con un 20% de descuento', images: ['/img/zapatillas/af1.webp', '/img/zapatillas/af12.webp', '/img/zapatillas/af13.webp'] },
+    { title: 'Jordan 1 Low', description: 'Un estilo clásico impecable que combina con cualquier look.', buttonText: 'Compra ahora', images: ['/img/zapatillas/jordan1.webp', '/img/zapatillas/jordan3.webp', '/img/zapatillas/jordan2.webp'] },
+    { title: 'Book 2 Tigers', description: 'Diseñadas para quienes convierten el movimiento en juego.', buttonText: 'Descubre más', images: ['/img/zapatillas/book21.webp', '/img/zapatillas/book22.webp', '/img/zapatillas/book23.webp'] },
+];
+
+function App() {
+    const [productos, setProductos] = useState(() => getLocalProducts());
+    const [userId, setUserId] = useState(() => localStorage.getItem('sneakerx_userId'));
+    const [sessionId, setSessionId] = useState(() => getOrCreateSessionId());
+    const [carrito, setCarrito] = useState([]);
+
+    useEffect(() => {
+        let mounted = true;
+        productService.getAll({ size: 1000 })
+            .then((data) => {
+                if (!mounted || !Array.isArray(data) || data.length === 0) return;
+                const mapped = data.map((p) => ({
+                    id: p.id,
+                    name: p.nombre || p.name,
+                    price: Number(p.precio ?? p.price ?? 0),
+                    image: p.imagenUrl || p.image || '',
+                    description: p.descripcion || p.description || '',
+                    category: p.categoria || p.category || '',
+                    stock: p.stock,
+                    destacado: p.destacado === true,
+                    enCarrusel: p.enCarrusel === true,
+                }));
+                setProductos(mapped);
+            })
+            .catch(() => {});
+        return () => { mounted = false; };
+    }, []);
+    const [destacado, setDestacado] = useState(0);
+    const [imagenDestacada, setImagenDestacada] = useState(0);
+    const [mostrarMiniCarrito, setMostrarMiniCarrito] = useState(false);
+
+    useEffect(() => {
+        const productTimer = window.setInterval(() => setDestacado((current) => (current + 1) % destacados.length), 20000);
+        return () => window.clearInterval(productTimer);
+    }, []);
+
+    useEffect(() => {
+        const imageTimer = window.setInterval(() => setImagenDestacada((current) => (current + 1) % destacados[destacado].images.length), 5000);
+        return () => window.clearInterval(imageTimer);
+    }, [destacado]);
+
+    const mapCartItem = (item) => ({
+        id: item.producto?.id ?? item.productoId,
+        cartItemId: item.id,
+        name: item.producto?.nombre ?? item.name,
+        price: Number(item.precioUnitario ?? item.price ?? 0),
+        image: item.producto?.imagenUrl ?? item.image ?? '',
+        size: item.talla || 'Unica',
+        cantidad: item.cantidad,
+    });
+
+    const loadCart = async () => {
+        try {
+            let data;
+            if (userId) {
+                data = await cartService.getCart(userId);
+            } else {
+                try {
+                    data = await cartService.getGuestCart(sessionId);
+                } catch (e) {
+                    // 404 = carrito no existe aún, tratar como vacío
+                    data = { items: [] };
+                }
+            }
+            const items = (data?.items || []).map(mapCartItem);
+            setCarrito(items);
+            saveLocalCart(items);
+        } catch {
+            setCarrito([]);
+        }
+    };
+
+    useEffect(() => { loadCart(); }, [userId]);
+
+    const agregarAlCarrito = async (producto, talla = 'Unica') => {
+        try {
+            if (userId) {
+                await cartService.addToCart(userId, producto.id, 1, talla);
+            } else {
+                await cartService.addToGuestCart(sessionId, producto.id, 1, talla);
+            }
+            await loadCart();
+        } catch {
+            const nuevoCarrito = [...carrito];
+            const existente = nuevoCarrito.find((item) => item.id === producto.id && item.size === talla);
+            if (existente) existente.cantidad += 1;
+            else nuevoCarrito.push({ ...producto, size: talla, cantidad: 1 });
+            setCarrito(nuevoCarrito);
+            saveLocalCart(nuevoCarrito);
+        }
+        setMostrarMiniCarrito(true);
+    };
+
+    const cambiarCantidad = async (id, size, cantidad) => {
+        const nuevaCantidad = Math.max(0, Number(cantidad));
+        const item = carrito.find((i) => i.id === id && i.size === size);
+        if (!item) return;
+        try {
+            if (nuevaCantidad === 0) {
+                if (userId) await cartService.removeCartItem(userId, item.cartItemId);
+                else await cartService.removeGuestCartItem(sessionId, item.cartItemId);
+            } else {
+                if (userId) await cartService.updateCartItem(userId, item.cartItemId, nuevaCantidad);
+                else await cartService.updateGuestCartItem(sessionId, item.cartItemId, nuevaCantidad);
+            }
+            await loadCart();
+        } catch {
+            const nuevoCarrito = nuevaCantidad === 0
+                ? carrito.filter((i) => !(i.id === id && i.size === size))
+                : carrito.map((i) => (i.id === id && i.size === size ? { ...i, cantidad: nuevaCantidad } : i));
+            setCarrito(nuevoCarrito);
+            saveLocalCart(nuevoCarrito);
+        }
+    };
+
+    const eliminarDelCarrito = (id, size) => cambiarCantidad(id, size, 0);
+
+
+
+    const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+
+    if (window.location.pathname.startsWith('/admin')) {
+        return (
+            <>
+                <AdminApp />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/mis-compras') {
+        if (!localStorage.getItem('sneakerx_jwt')) { window.location.replace('/login'); return null; }
+        return (
+            <>
+                <MisCompras totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/editar-perfil') {
+        if (!localStorage.getItem('sneakerx_jwt')) { window.location.replace('/login'); return null; }
+        return (
+            <>
+                <EditarPerfil />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/productos') {
+        return (
+            <>
+                <Productos
+                    productos={productos}
+                    carrito={carrito}
+                    onAgregarCarrito={agregarAlCarrito}
+                    onCambiarCantidad={cambiarCantidad}
+                    onEliminarProducto={eliminarDelCarrito}
+                />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/carrito') {
+        return (
+            <>
+                <Carrito
+                    carrito={carrito}
+                    onCambiarCantidad={cambiarCantidad}
+                    onEliminarProducto={eliminarDelCarrito}
+                />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/nosotros') {
+        return (
+            <>
+                <Nosotros totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/contacto') {
+        return (
+            <>
+                <Contacto totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/cuenta') {
+        return (
+            <>
+                <Cuenta totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/login') {
+        return (
+            <>
+                <Login totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/registro') {
+        return (
+            <>
+                <Registro totalItems={totalItems} />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/pago') {
+        return (
+            <>
+                <Pago carrito={carrito} onPagoCompletado={() => { setCarrito([]); saveLocalCart([]); }} />
+                <ChatWidget />
+            </>
+        );
+    }
+
+    if (window.location.pathname === '/blog') {
+        return (
+            <div className="bg-[#f3f4f6] text-slate-900 antialiased min-h-screen">
+                <Navbar totalItems={totalItems} activePath="/blog" />
+                <main>
+                    <Blogs />
+                </main>
+                <ChatWidget />
+            </div>
+        );
+    }
+
+    if (window.location.pathname.startsWith('/blog/')) {
+        const blogId = window.location.pathname.split('/')[2]; 
+        return (
+            <div className="bg-[#f3f4f6] text-slate-900 antialiased min-h-screen">
+                <Navbar totalItems={totalItems} activePath="/blog" />
+                <main>
+                    {}
+                    <BlogDetail id={blogId} /> 
+                </main>
+                <ChatWidget />
+            </div>
+        );
+    }
+
+
+    const coleccion = destacados[destacado];
+    return (
+        <div className="bg-[#f3f4f6] text-slate-900 antialiased min-h-screen">
+            <Navbar totalItems={totalItems} activePath="/" />
+
+            {mostrarMiniCarrito && (
+                <aside className="fixed right-4 top-36 z-40 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15" aria-label="Resumen del carrito">
+                    <div className="flex items-center justify-between bg-[#111827] px-5 py-3 text-white">
+                        <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">Tu selección</p>
+                            <h2 className="mt-0.5 font-bold">Carrito <span className="ml-1 text-xs font-normal text-slate-300">({totalItems})</span></h2>
+                        </div>
+                        <button type="button" onClick={() => setMostrarMiniCarrito(false)} className="btn-close btn-close-white" aria-label="Cerrar resumen del carrito" />
+                    </div>
+                    <div className="p-4">
+                        <p className="mb-3 text-sm font-semibold text-slate-700">{totalItems} producto(s) agregado(s)</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button type="button" onClick={() => setMostrarMiniCarrito(false)} className="btn btn-outline-secondary btn-sm">Seguir comprando</button>
+                            <a href="/carrito" className="btn btn-dark btn-sm">Ir al carrito</a>
+                        </div>
+                    </div>
+                </aside>
+            )}
+
+            {/* Contenido Principal */}
+            <main>
+                <HeroCarousel />
+
+                {/* Sección Más Vendidas */}
+                <section className="mx-auto max-w-[96rem] px-4 py-4 lg:px-6 lg:py-6" aria-labelledby="bestsellers-title">
+                    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Lo que todos están usando</p>
+                            <h2 id="bestsellers-title" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Más vendidas</h2>
+                        </div>
+                        <a href="/productos" className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 no-underline shadow-sm transition hover:border-slate-900 hover:text-slate-900">Ver todo el catálogo <span className="ml-2" aria-hidden="true">→</span></a>
+                    </div>
+                    
+                    {/* Aquí renderizamos los primeros 4 productos usando tu base de datos simulada */}
+                    <div className="mt-2 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                        {(productos.filter((p) => p.destacado).length ? productos.filter((p) => p.destacado) : productos.slice(0, 4)).map(producto => (
+                            <Producto 
+                                key={producto.id} 
+                                producto={producto} 
+                                onAgregarCarrito={agregarAlCarrito} 
+                            />
+                        ))}
+                    </div>
+                </section>
+            </main>
+
+            <ChatWidget />
+        </div>
+    );
+}
+
+export default App;
