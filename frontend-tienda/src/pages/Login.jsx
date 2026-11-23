@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import { authService, cartService, getSessionId, clearSessionId } from '../services/api';
+import { getUsers, saveUserSession } from '../data/users';
 
 function Login({ totalItems = 0 }) {
     const [username, setUsername] = useState('');
@@ -16,8 +17,19 @@ function Login({ totalItems = 0 }) {
                 client_id: clientId,
                 callback: async (response) => {
                     try {
-                        await authService.googleLogin(response.credential);
-                        window.location.href = '/';
+                        const data = await authService.googleLogin(response.credential);
+                        const usuario = data?.usuario || data?.user || {};
+                        const rawRole = String(usuario.role || data?.role || '').trim().toUpperCase();
+                        if (rawRole === 'VENDEDOR' || rawRole === 'SELLER') {
+                            localStorage.setItem('usuarioLogueado', JSON.stringify({
+                                nombre: usuario.username || data?.username || '',
+                                email: usuario.email || '',
+                                rol: 'vendedor',
+                            }));
+                            window.location.href = '/admin/productos';
+                            return;
+                        }
+                        window.location.href = rawRole === 'ADMIN' ? '/admin' : '/';
                     } catch (err) {
                         setError(err.message || 'No se pudo iniciar sesión con Google.');
                     }
@@ -37,16 +49,26 @@ function Login({ totalItems = 0 }) {
             init();
         }
     }, []);
+
     const iniciarSesion = async (event) => {
         event.preventDefault();
         setError('');
+        const cleanUser = username.trim();
+        const cleanPass = password.trim();
+
         try {
-            const data = await authService.login(username.trim(), password.trim());
+            const data = await authService.login(cleanUser, cleanPass);
             const usuario = data?.usuario || data?.user || {};
+            const rawRole = String(usuario.role || data?.role || '').trim().toUpperCase();
+            const rol = rawRole === 'ADMIN' || rawRole === 'ADMINISTRADOR'
+                ? 'admin'
+                : rawRole === 'VENDEDOR' || rawRole === 'SELLER'
+                    ? 'vendedor'
+                    : 'usuario';
             const userData = {
-                nombre: usuario.username || data?.username || username,
+                nombre: usuario.username || data?.username || cleanUser,
                 email: usuario.email || '',
-                rol: (usuario.role || data?.role) === 'ADMIN' ? 'admin' : 'usuario',
+                rol,
             };
             localStorage.setItem('usuarioLogueado', JSON.stringify(userData));
             const sid = getSessionId();
@@ -55,8 +77,28 @@ function Login({ totalItems = 0 }) {
                 try { console.log('Transferring cart', sid, uid); await cartService.transferCart(sid, uid); console.log('Cart transferred'); } catch (e) { console.error('Transfer failed:', e); }
                 clearSessionId();
             }
-            window.location.href = userData.rol === 'admin' ? '/admin' : '/';
+            window.location.href = userData.rol === 'admin'
+                ? '/admin'
+                : userData.rol === 'vendedor'
+                    ? '/admin/productos'
+                    : '/';
         } catch (loginError) {
+            const localUser = getUsers().find(
+                (u) =>
+                    (u.email?.trim().toLowerCase() === cleanUser.toLowerCase() ||
+                        u.name?.trim().toLowerCase() === cleanUser.toLowerCase()) &&
+                    u.password === cleanPass
+            );
+            if (localUser) {
+                saveUserSession(localUser);
+                const roleLower = String(localUser.role || '').trim().toLowerCase();
+                window.location.href = roleLower === 'administrador' || roleLower === 'admin'
+                    ? '/admin'
+                    : roleLower === 'vendedor'
+                        ? '/admin/productos'
+                        : '/';
+                return;
+            }
             setError(loginError.message || 'Usuario o contraseña incorrectos.');
         }
     };
