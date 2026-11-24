@@ -80,7 +80,7 @@ function AdminApp() {
             window.location.replace('/login');
         } else if (!hasPanelAccess) {
             window.location.replace('/');
-        } else if (isSeller && (pathname === '/admin/compras' || pathname === '/admin/contacto')) {
+        } else if (isSeller && pathname === '/admin/contacto') {
             window.location.replace(adminPaths.products);
         }
     }, [checking, hasPanelAccess, isSeller, pathname, session]);
@@ -88,7 +88,7 @@ function AdminApp() {
     if (checking) return <div className="min-h-screen grid place-items-center text-slate-500">Cargando panel...</div>;
     if (!session) { window.location.replace('/login'); return <div className="min-h-screen grid place-items-center text-slate-500">Redirigiendo al login...</div>; }
     if (!hasPanelAccess) { window.location.replace('/'); return null; }
-    if (isSeller && (pathname === '/admin/compras' || pathname === '/admin/contacto')) {
+    if (isSeller && pathname === '/admin/contacto') {
         window.location.replace(adminPaths.products);
         return null;
     }
@@ -107,7 +107,7 @@ function AdminApp() {
         <AdminShell page={currentPage} session={session} now={now} isSeller={isSeller}>
             {currentPage === 'users' && <UsersPage session={session} setSession={setSession} isSeller={isSeller} />}
             {currentPage === 'products' && <ProductsPage isSeller={isSeller} />}
-            {currentPage === 'purchases' && isAdmin && <PurchasesPage />}
+            {currentPage === 'purchases' && hasPanelAccess && <PurchasesPage />}
             {currentPage === 'contact' && isAdmin && <ContactPage />}
             {currentPage === 'dashboard' && <DashboardPage session={session} now={now} isSeller={isSeller} />}
         </AdminShell>
@@ -145,6 +145,7 @@ function AdminShell({ page, session, now, isSeller, children }) {
         ? [
             { key: 'dashboard', label: 'Resumen', icon: '▦', href: adminPaths.dashboard },
             { key: 'products', label: 'Stock Productos', icon: '◇', href: adminPaths.products },
+            { key: 'purchases', label: 'Boletas', icon: '▤', href: adminPaths.purchases },
             { key: 'users', label: 'Clientes', icon: '♙', href: adminPaths.users },
         ]
         : [
@@ -282,7 +283,7 @@ function DashboardPage({ session, isSeller }) {
             <PageHeader
                 section="Resumen"
                 title={`${greeting}, ${firstName}`}
-                description={isSeller ? 'Consulta el stock disponible y la cartera de clientes.' : 'Resumen de la actividad de tu tienda.'}
+                description={isSeller ? 'Consulta el stock disponible, las boletas emitidas y la cartera de clientes.' : 'Resumen de la actividad de tu tienda.'}
                 action={<a href="/" target="_blank" rel="noreferrer" className={`admin-dark-action ${buttonClass}`}>Ver tienda</a>}
             />
             <div className="px-6 py-8 lg:px-10">
@@ -316,7 +317,12 @@ function DashboardPage({ session, isSeller }) {
                                 title={isSeller ? 'Ver clientes' : 'Gestionar usuarios'}
                                 description={isSeller ? 'Consulta los clientes registrados.' : 'Administra los accesos del equipo.'}
                             />
-                            {!isSeller && <QuickLink href={adminPaths.purchases} icon="▤" title="Ver compras" description="Historial de boletas y detalle." />}
+                            <QuickLink
+                                href={adminPaths.purchases}
+                                icon="▤"
+                                title={isSeller ? 'Ver boletas' : 'Ver compras'}
+                                description="Historial de boletas y detalle."
+                            />
                             {!isSeller && <QuickLink href={adminPaths.contact} icon="✉" title="Soporte" description="Solicitudes y tickets." />}
                         </div>
                     </div>
@@ -325,7 +331,7 @@ function DashboardPage({ session, isSeller }) {
                         <h2 className="mt-2 break-all text-xl font-bold">{session.email}</h2>
                         <p className="mt-3 text-sm leading-6 text-slate-400">
                             {isSeller
-                                ? 'Tu cuenta tiene permisos de consulta para revisar el stock disponible de productos y ver el listado de clientes.'
+                                ? 'Tu cuenta tiene permisos de consulta para revisar el stock disponible, ver boletas emitidas y consultar el listado de clientes.'
                                 : 'Tu cuenta tiene permisos para administrar el inventario y el equipo de SneakerX.'}
                         </p>
                         <a href={isSeller ? adminPaths.products : adminPaths.users} className="admin-light-action mt-8 inline-flex rounded-xl bg-white px-4 py-3 text-sm font-semibold transition hover:bg-slate-200">
