@@ -1,16 +1,10 @@
 const USERS_KEY = 'store_users';
 const SESSION_KEY = 'usuarioLogueado';
 
-const defaultUsers = [
-    { id: 1, name: 'Jhon Doe', role: 'Administrador', email: 'jhon.doe@adminshop.cl', password: 'admin123' },
-    { id: 2, name: 'Carlos Vendedor', role: 'Vendedor', email: 'vendedor@adminshop.cl', password: 'vendedor123' },
-];
-
 export function getUsers() {
     const stored = localStorage.getItem(USERS_KEY);
     if (stored === null) {
-        saveUsers(defaultUsers);
-        return [...defaultUsers];
+        return [];
     }
 
     const users = JSON.parse(stored);
@@ -18,8 +12,7 @@ export function getUsers() {
         throw new Error('No se pudo leer la lista de usuarios guardada.');
     }
     if (users.length === 0) {
-        saveUsers(defaultUsers);
-        return [...defaultUsers];
+        return [];
     }
     return users;
 }

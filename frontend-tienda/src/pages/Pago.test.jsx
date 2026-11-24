@@ -3,6 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Pago from './Pago';
 
+vi.mock('../services/api', async (importOriginal) => {
+    const actual = await importOriginal();
+    return { ...actual, paymentService: { createPayment: vi.fn().mockResolvedValue({}) } };
+});
+
 const cart = [{ id: 3, name: 'Nike Air Force 1', price: 100000, image: '/shoe.jpg', size: 42, cantidad: 2 }];
 
 describe('pago y boleta', () => {

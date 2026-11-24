@@ -2,9 +2,10 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AdminApp from './AdminApp';
+import { paymentService } from '../services/api';
 vi.mock('../services/api', async (importOriginal) => {
  const actual = await importOriginal();
- return { ...actual, authService: { ...actual.authService, getProfile: vi.fn().mockResolvedValue({ username: 'Admin', email: 'admin@example.com', role: 'ADMIN' }) } };
+ return { ...actual, paymentService: { getAll: vi.fn() }, authService: { ...actual.authService, getProfile: vi.fn().mockResolvedValue({ username: 'Admin', email: 'admin@example.com', role: 'ADMIN' }) } };
 });
 
 describe('historial de compras del administrador', () => {
@@ -34,11 +35,16 @@ describe('historial de compras del administrador', () => {
     });
 
     it('muestra al comprador y permite abrir el detalle de su boleta', async () => {
+        paymentService.getAll.mockResolvedValue([{
+            receiptNumber: 'SX-123-ABCDE', createdAt: '2026-10-12T12:00:00.000Z',
+            buyerName: 'Ana Compradora', buyerEmail: 'ana@example.com', total: 119000,
+            items: [{ productoId: 2, nombre: 'Nike Air Force 1', talla: 42, cantidad: 1, precioUnitario: 100000 }],
+        }]);
         const user = userEvent.setup();
         render(<AdminApp />);
 
         expect(await screen.findByRole('heading', { name: 'Historial de compras' })).toBeTruthy();
-        expect(screen.getByText('ana@example.com')).toBeTruthy();
+        expect(await screen.findByText('ana@example.com')).toBeTruthy();
         await user.click(screen.getByRole('button', { name: 'Ver boleta' }));
 
         expect(screen.getByRole('dialog')).toBeTruthy();
@@ -46,4 +52,12 @@ describe('historial de compras del administrador', () => {
         expect(within(receiptDialog).getByText('SX-123-ABCDE')).toBeTruthy();
         expect(within(receiptDialog).getByText(/Nike Air Force 1/)).toBeTruthy();
     });
+    it('no muestra compras locales si falla la API', async () => {
+        paymentService.getAll.mockRejectedValue(new Error('Sin conexión'));
+        render(<AdminApp />);
+        await screen.findByRole('heading', { name: 'Historial de compras' });
+        expect(screen.queryByText('ana@example.com')).toBeNull();
+        expect(screen.queryByRole('button', { name: 'Ver boleta' })).toBeNull();
+    });
+
 });
