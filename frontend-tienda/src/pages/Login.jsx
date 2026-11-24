@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import { authService, cartService, getSessionId, clearSessionId } from '../services/api';
-import { getUsers, saveUserSession } from '../data/users';
 
 function Login({ totalItems = 0 }) {
     const [username, setUsername] = useState('');
@@ -83,22 +82,7 @@ function Login({ totalItems = 0 }) {
                     ? '/admin/productos'
                     : '/';
         } catch (loginError) {
-            const localUser = getUsers().find(
-                (u) =>
-                    (u.email?.trim().toLowerCase() === cleanUser.toLowerCase() ||
-                        u.name?.trim().toLowerCase() === cleanUser.toLowerCase()) &&
-                    u.password === cleanPass
-            );
-            if (localUser) {
-                saveUserSession(localUser);
-                const roleLower = String(localUser.role || '').trim().toLowerCase();
-                window.location.href = roleLower === 'administrador' || roleLower === 'admin'
-                    ? '/admin'
-                    : roleLower === 'vendedor'
-                        ? '/admin/productos'
-                        : '/';
-                return;
-            }
+            for (const key of ['usuarioLogueado', 'sneakerx_jwt', 'sneakerx_userId', 'sneakerx_username', 'sneakerx_role', 'sneakerx_user']) localStorage.removeItem(key);
             setError(loginError.message || 'Usuario o contraseña incorrectos.');
         }
     };

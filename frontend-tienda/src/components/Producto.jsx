@@ -1,3 +1,4 @@
+import { imagePath } from '../services/image';
 import { useState } from 'react';
 import { availableSizes, formatCLP } from '../data/db';
 
@@ -7,9 +8,9 @@ export const Producto = ({ producto, onAgregarCarrito }) => {
     const agotado = stock <= 0;
 
     return (
-        <article className="group overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg">
-            <div className="relative h-56 overflow-hidden rounded-t-3xl bg-slate-100">
-                <img src={producto.image} alt={producto.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        <article className="shop-product">
+            <div className="shop-product-image">
+                <img src={imagePath(producto.image)} alt={producto.name} className="shop-product-photo" loading="lazy" />
                 {stock <= 0 && (
                     <span className="absolute left-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">AGOTADO</span>
                 )}
@@ -17,7 +18,7 @@ export const Producto = ({ producto, onAgregarCarrito }) => {
                     <span className="absolute left-3 top-3 rounded-full bg-yellow-400 px-3 py-1 text-xs font-bold text-yellow-900">ÚLTIMAS UNIDADES</span>
                 )}
             </div>
-            <div className="flex min-h-[230px] flex-col p-5">
+            <div className="shop-product-copy">
                 <p className="text-xs uppercase tracking-wider text-slate-400">{producto.category || producto.categoria || "SneakerX"}</p>
                 <h3 className="mt-2 font-bold">{producto.name}</h3>
                 <p className="mt-1 line-clamp-2 text-sm text-slate-500">{producto.description}</p>

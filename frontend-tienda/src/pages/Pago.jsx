@@ -1,3 +1,4 @@
+import { imagePath } from '../services/image';
 import { useState, useEffect } from 'react';
 import { formatCLP } from '../data/db';
 import { createPurchase } from '../data/purchases';
@@ -5,7 +6,6 @@ import { paymentService, cartService, getSessionId, authService } from '../servi
 import { getSession } from '../data/users';
 import Navbar from '../components/Navbar';
 
-const imagePath = (image) => image.startsWith('/') ? image : `/${image}`;
 
 function Pago({ carrito, onPagoCompletado }) {
     const session = getSession();
@@ -126,7 +126,7 @@ function Pago({ carrito, onPagoCompletado }) {
     return (
         <div className="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
             <Navbar totalItems={carrito.reduce((sum, item) => sum + item.cantidad, 0)} activePath="/pago" />
-            <main className="mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
+            <main className="shop-fluid-page mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
                 <div className="mb-10"><p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Compra segura</p><h1 className="mt-2 text-4xl font-bold tracking-tight">Finaliza tu pedido</h1><p className="mt-3 text-slate-500">Completa tus datos para preparar la entrega.</p></div>
                 <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

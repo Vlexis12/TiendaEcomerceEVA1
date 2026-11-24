@@ -32,7 +32,7 @@ function Contacto({ totalItems = 0 }) {
         <div className="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
             <Navbar totalItems={totalItems} activePath="/contacto" />
 
-            <main className="mx-auto grid max-w-7xl gap-10 px-6 py-12 lg:min-h-[calc(100vh-8rem)] lg:grid-cols-[.85fr_1.15fr] lg:items-center lg:px-8 lg:py-16">
+            <main className="shop-fluid-page mx-auto grid max-w-7xl gap-10 px-6 py-12 lg:min-h-[calc(100vh-8rem)] lg:grid-cols-[.85fr_1.15fr] lg:items-center lg:px-8 lg:py-16">
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Estamos para ayudarte</p>
                     <h1 className="mt-3 text-5xl font-bold tracking-tight sm:text-7xl">Hablemos de tu próximo par.</h1>

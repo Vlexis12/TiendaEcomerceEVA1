@@ -1,9 +1,9 @@
+import { imagePath } from '../services/image';
 import { useEffect, useMemo, useState } from "react";
 import { Producto } from '../components/Producto';
 import { formatCLP, sortProductsByPrice } from '../data/db';
 import Navbar from '../components/Navbar';
 
-const imagePath = (image) => image.startsWith('/') ? image : `/${image}`;
 
 function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, onEliminarProducto }) {
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
@@ -107,7 +107,7 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                 </aside>
             )}
 
-            <main className="mx-auto max-w-[100rem] px-4 py-7 sm:px-6 lg:px-8 lg:py-10">
+            <main className="shop-fluid-page mx-auto max-w-[100rem] px-4 py-7 sm:px-6 lg:px-8 lg:py-10">
                 <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Selección SneakerX</p>
@@ -131,7 +131,7 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                     </div>
                 </div>
 
-                <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="shop-catalog-grid mt-10">
                     {paginatedProducts.map((producto) => (
                         <Producto
                             key={producto.id}

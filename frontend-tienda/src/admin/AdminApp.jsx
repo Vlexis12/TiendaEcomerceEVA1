@@ -1,18 +1,21 @@
+import AdminShell, { AdminIcon } from './AdminShell';
+import BlogsPage from './BlogsPage';
+import { imagePath } from '../services/image';
 import { useEffect, useMemo, useState } from 'react';
 import { formatCLP, getProducts as getLocalProducts } from '../data/db';
-import { productService, adminService, authService, paymentService, contactService, API_BASE } from '../services/api';
+import { productService, adminService, authService, paymentService, contactService } from '../services/api';
 import { getPurchases } from '../data/purchases';
 import ContactPage from './ContactPage';
 import './AdminApp.css';
 import {
     createAdminEmail,
     findUserByEmail,
-    getSession,
     getUsers,
 } from '../data/users';
 
 const adminPaths = {
     dashboard: '/admin',
+    blogs: '/admin/blogs',
     users: '/admin/usuarios',
     products: '/admin/productos',
     purchases: '/admin/compras',
@@ -33,36 +36,19 @@ function AdminApp() {
     const isSeller = isSellerRole(activeUserRole);
     const hasPanelAccess = isAdmin || isSeller;
     const pathname = window.location.pathname;
-    const [now, setNow] = useState(new Date());
-
-    useEffect(() => {
-        const timer = setInterval(() => setNow(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
-
-    useEffect(() => {
+useEffect(() => {
         let mounted = true;
         const init = async () => {
-            let s = getSession();
-            const storedRole = localStorage.getItem('sneakerx_role');
-
-            if (s && !isAdminRole(s.rol) && !isSellerRole(s.rol) && isSellerRole(storedRole)) {
-                s = { ...s, rol: 'vendedor' };
-                localStorage.setItem('usuarioLogueado', JSON.stringify(s));
-            }
-
-            if (!s && localStorage.getItem('sneakerx_jwt')) {
+            let s = null;
+            if (localStorage.getItem('sneakerx_jwt')) {
                 try {
                     const profile = await authService.getProfile();
-                    const mappedRole = isAdminRole(profile.role)
-                        ? 'admin'
-                        : isSellerRole(profile.role)
-                            ? 'vendedor'
-                            : 'usuario';
-                    s = { nombre: profile.username, email: profile.email, rol: mappedRole };
+                    const rol = isAdminRole(profile.role) ? 'admin' : isSellerRole(profile.role) ? 'vendedor' : 'usuario';
+                    s = { nombre: profile.username, email: profile.email, rol };
                     localStorage.setItem('usuarioLogueado', JSON.stringify(s));
                 } catch {
-                    s = null;
+                    localStorage.removeItem('sneakerx_jwt');
+                    localStorage.removeItem('usuarioLogueado');
                 }
             }
             if (mounted) {
@@ -80,7 +66,7 @@ function AdminApp() {
             window.location.replace('/login');
         } else if (!hasPanelAccess) {
             window.location.replace('/');
-        } else if (isSeller && pathname === '/admin/contacto') {
+        } else if (isSeller && ['/admin/contacto', '/admin/blogs'].includes(pathname)) {
             window.location.replace(adminPaths.products);
         }
     }, [checking, hasPanelAccess, isSeller, pathname, session]);
@@ -88,12 +74,12 @@ function AdminApp() {
     if (checking) return <div className="min-h-screen grid place-items-center text-slate-500">Cargando panel...</div>;
     if (!session) { window.location.replace('/login'); return <div className="min-h-screen grid place-items-center text-slate-500">Redirigiendo al login...</div>; }
     if (!hasPanelAccess) { window.location.replace('/'); return null; }
-    if (isSeller && pathname === '/admin/contacto') {
+    if (isSeller && ['/admin/contacto', '/admin/blogs'].includes(pathname)) {
         window.location.replace(adminPaths.products);
         return null;
     }
 
-    const currentPage = pathname === '/admin/usuarios'
+    const currentPage = pathname === '/admin/blogs' ? 'blogs' : pathname === '/admin/usuarios'
         ? 'users'
         : pathname === '/admin/productos'
             ? 'products'
@@ -104,121 +90,20 @@ function AdminApp() {
                     : 'dashboard';
 
     return (
-        <AdminShell page={currentPage} session={session} now={now} isSeller={isSeller}>
+        <AdminShell page={currentPage} session={session} isSeller={isSeller}>
+            {currentPage === 'blogs' && isAdmin && <BlogsPage />}
             {currentPage === 'users' && <UsersPage session={session} setSession={setSession} isSeller={isSeller} />}
             {currentPage === 'products' && <ProductsPage isSeller={isSeller} />}
             {currentPage === 'purchases' && hasPanelAccess && <PurchasesPage />}
             {currentPage === 'contact' && isAdmin && <ContactPage />}
-            {currentPage === 'dashboard' && <DashboardPage session={session} now={now} isSeller={isSeller} />}
+            {currentPage === 'dashboard' && <DashboardPage session={session} isSeller={isSeller} />}
         </AdminShell>
-    );
-}
-
-function AdminShell({ page, session, now, isSeller, children }) {
-    const logout = () => {
-        localStorage.clear();
-        window.location.assign('/login');
-    };
-    const [photoUrl, setPhotoUrl] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-
-    useEffect(() => {
-        const token = localStorage.getItem('sneakerx_jwt');
-        if (!token) return;
-        let mounted = true;
-        (async () => {
-            try {
-                const profile = await authService.getProfile();
-                if (profile?.id && mounted) {
-                    const res = await fetch(`${API_BASE}/user/usuarios/${profile.id}/foto`, { headers: { Authorization: `Bearer ${token}` } });
-                    if (res.ok) {
-                        const blob = await res.blob();
-                        if (mounted) setPhotoUrl(URL.createObjectURL(blob));
-                    }
-                }
-            } catch {}
-        })();
-        return () => { mounted = false; };
-    }, []);
-
-    const links = isSeller
-        ? [
-            { key: 'dashboard', label: 'Resumen', icon: '▦', href: adminPaths.dashboard },
-            { key: 'products', label: 'Stock Productos', icon: '◇', href: adminPaths.products },
-            { key: 'purchases', label: 'Boletas', icon: '▤', href: adminPaths.purchases },
-            { key: 'users', label: 'Clientes', icon: '♙', href: adminPaths.users },
-        ]
-        : [
-            { key: 'dashboard', label: 'Dashboard', icon: '▦', href: adminPaths.dashboard },
-            { key: 'users', label: 'Usuarios', icon: '♙', href: adminPaths.users },
-            { key: 'products', label: 'Productos', icon: '◇', href: adminPaths.products },
-            { key: 'purchases', label: 'Compras', icon: '▤', href: adminPaths.purchases },
-            { key: 'contact', label: 'Contacto', icon: '✉', href: adminPaths.contact },
-        ];
-
-    return (
-        <div data-admin-panel className="flex min-h-screen flex-col bg-[#f3f4f6] text-slate-900 antialiased lg:flex-row">
-            <aside className={`flex w-full flex-col bg-[#111827] px-5 py-6 text-white lg:min-h-screen transition-all ${sidebarOpen ? 'lg:w-64' : 'lg:w-0 lg:overflow-hidden lg:px-0 lg:py-0'}`}>
-                <a href={adminPaths.dashboard} className="flex items-center gap-3 px-3">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-white text-lg font-black text-[#111827]">S</span>
-                    <span>
-                        <strong className="block text-lg tracking-tight">SneakerX</strong>
-                        <small className="text-xs text-slate-400">{isSeller ? 'VENDEDOR' : 'ADMINISTRADOR'}</small>
-                    </span>
-                </a>
-                <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-center gap-3">
-                        {photoUrl
-                            ? <img src={photoUrl} alt={session.nombre} className="h-11 w-11 rounded-full object-cover" />
-                            : <div className="grid h-11 w-11 place-items-center rounded-full bg-white font-bold text-[#111827]">{initials(session.nombre)}</div>}
-                        <div className="min-w-0">
-                            <p className="font-semibold truncate">{session.nombre}</p>
-                            <p className="text-xs text-slate-400">{isSeller ? 'Vendedor' : 'Administrador'}</p>
-                        </div>
-                    </div>
-                    <p className="mt-3 truncate text-xs text-slate-400">{session.email}</p>
-                </div>
-                <nav className="mt-8 space-y-2" aria-label="Navegación del panel">
-                    {links.map((link) => (
-                        <a key={link.key} href={link.href} aria-current={page === link.key ? 'page' : undefined} className={`admin-sidebar-link flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${page === link.key ? 'admin-sidebar-link-active bg-white font-semibold' : 'font-medium hover:bg-white/10'}`}>
-                            <span aria-hidden="true">{link.icon}</span>{link.label}
-                        </a>
-                    ))}
-                </nav>
-                <div className="mt-auto hidden pt-8 lg:block">
-                    <a href="/" className="admin-sidebar-link flex items-center gap-3 px-4 py-3 text-sm transition">← Volver a la tienda</a>
-                    <button type="button" onClick={logout} className="w-full px-4 py-3 text-left text-sm text-slate-400 transition hover:text-white active:bg-white/10 active:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Cerrar sesión</button>
-                </div>
-                <div className="mt-4 flex gap-4 lg:hidden">
-                    <a href="/" className="admin-sidebar-link text-sm">← Volver a la tienda</a>
-                    <button type="button" onClick={logout} className="text-sm text-slate-400 hover:text-white active:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Cerrar sesión</button>
-                </div>
-            </aside>
-            <main className="min-w-0 flex-1 overflow-y-auto">
-                <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-4 backdrop-blur">
-                    <div className="flex items-center gap-3">
-                        <button type="button" onClick={() => setSidebarOpen((v) => !v)} className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200">
-                            {sidebarOpen ? '⟨ Ocultar' : '☰ Menú'}
-                        </button>
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{page}</p>
-                            <p className="text-sm font-semibold text-slate-700">{isSeller ? 'Panel de vendedor' : 'Panel de administración'}</p>
-                        </div>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-sm font-bold text-slate-900">{now.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                        <p className="text-xs text-slate-500">{now.toLocaleTimeString('es-CL')}</p>
-                    </div>
-                </header>
-                <div className="p-6">{children}</div>
-            </main>
-        </div>
     );
 }
 
 function PageHeader({ section, title, description, action }) {
     return (
-        <header className="border-b border-slate-200 bg-white px-6 py-6 lg:px-10">
+        <header className="admin-page-heading">
             <p className="text-sm font-medium text-slate-500">Panel de control / {section}</p>
             <div className="mt-1 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div><h1 className="text-3xl font-bold tracking-tight">{title}</h1><p className="mt-2 text-sm text-slate-500">{description}</p></div>
@@ -326,13 +211,13 @@ function DashboardPage({ session, isSeller }) {
                             {!isSeller && <QuickLink href={adminPaths.contact} icon="✉" title="Soporte" description="Solicitudes y tickets." />}
                         </div>
                     </div>
-                    <div className="rounded-2xl bg-[#111827] p-6 text-white shadow-sm">
-                        <p className="text-sm text-slate-400">Acceso actual ({isSeller ? 'Vendedor' : 'Administrador'})</p>
-                        <h2 className="mt-2 break-all text-xl font-bold">{session.email}</h2>
+                    <div className="admin-guide-card">
+                        <p className="text-sm text-slate-400">TU ESPACIO DE TRABAJO</p>
+                        <h2 className="mt-2 text-xl font-bold">Cada detalle cuenta.</h2>
                         <p className="mt-3 text-sm leading-6 text-slate-400">
                             {isSeller
                                 ? 'Tu cuenta tiene permisos de consulta para revisar el stock disponible, ver boletas emitidas y consultar el listado de clientes.'
-                                : 'Tu cuenta tiene permisos para administrar el inventario y el equipo de SneakerX.'}
+                                : 'Mantén tu catálogo al día, acompaña a tus clientes y comparte nuevas historias desde un solo lugar.'}
                         </p>
                         <a href={isSeller ? adminPaths.products : adminPaths.users} className="admin-light-action mt-8 inline-flex rounded-xl bg-white px-4 py-3 text-sm font-semibold transition hover:bg-slate-200">
                             {isSeller ? 'Ver stock disponible →' : 'Revisar usuarios →'}
@@ -345,11 +230,11 @@ function DashboardPage({ session, isSeller }) {
 }
 
 function Metric({ title, value, detail }) {
-    return <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-sm text-slate-500">{title}</p><p className="mt-3 text-3xl font-bold">{value}</p><p className="mt-2 text-xs text-slate-500">{detail}</p></article>;
+    return <article className="admin-metric"><p className="text-sm text-slate-500">{title}</p><p className="mt-3 text-3xl font-bold">{value}</p><p className="mt-2 text-xs text-slate-500">{detail}</p></article>;
 }
 
-function QuickLink({ href, icon, title, description }) {
-    return <a href={href} className="rounded-xl border border-slate-200 p-4 transition hover:border-slate-400 hover:bg-slate-50"><span className="text-2xl">{icon}</span><h3 className="mt-4 font-semibold">{title}</h3><p className="mt-1 text-sm text-slate-500">{description}</p></a>;
+function QuickLink({ href, title, description }) {
+    return <a href={href} className="admin-quick-link"><span className="admin-quick-icon"><AdminIcon name={href.includes("productos") ? "products" : href.includes("usuarios") ? "users" : href.includes("compras") ? "purchases" : "contact"}/></span><h3 className="mt-4 font-semibold">{title}</h3><p className="mt-1 text-sm text-slate-500">{description}</p></a>;
 }
 
 function PurchasesPage() {
@@ -624,7 +509,7 @@ function ProductsPage({ isSeller }) {
                                 <tr><td colSpan={isSeller ? 4 : 5} className="px-5 py-12 text-center text-sm text-slate-500">No hay zapatillas registradas.</td></tr>
                             ) : products.map((product) => (
                                 <tr key={product.id} className="transition hover:bg-slate-50">
-                                    <td className="px-5 py-4"><img src={adminImagePath(product.image)} className="h-14 w-14 rounded-xl object-cover" alt={product.name} /></td>
+                                    <td className="px-5 py-4"><img src={imagePath(product.image)} className="h-14 w-14 rounded-xl object-cover" alt={product.name} /></td>
                                     <td className="px-5 py-4 font-semibold">{product.name}</td>
                                     <td className="px-5 py-4">{formatCLP(product.price)}</td>
                                     <td className="px-5 py-4">
@@ -664,10 +549,7 @@ function InfoCard({ title, value, detail }) {
     return <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-sm text-slate-500">{title}</p><p className="mt-2 text-xl font-bold">{value}</p><p className="mt-1 text-xs text-slate-500">{detail}</p></div>;
 }
 
-function adminImagePath(image = '') {
-    if (/^(https?:|data:|blob:|\/)/i.test(image)) return image;
-    return `/${image}`;
-}
+
 
 function UsersPage({ session, setSession, isSeller }) {
     const [users, setUsers] = useState([]);

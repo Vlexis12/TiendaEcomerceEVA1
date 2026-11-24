@@ -38,7 +38,7 @@ function MisCompras({ totalItems = 0 }) {
     return (
         <div className="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
             <Navbar totalItems={totalItems} activePath="/mis-compras" />
-            <main className="mx-auto max-w-6xl px-6 py-10">
+            <main className="shop-fluid-page mx-auto max-w-6xl px-6 py-10">
                 <h1 className="text-3xl font-bold tracking-tight">Mis compras</h1>
                 <p className="mt-2 text-slate-500">Historial de tus pedidos realizados.</p>
                 {loading && <p className="mt-6 text-slate-500">Cargando...</p>}

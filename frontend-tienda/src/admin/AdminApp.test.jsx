@@ -1,11 +1,16 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AdminApp from './AdminApp';
+vi.mock('../services/api', async (importOriginal) => {
+ const actual = await importOriginal();
+ return { ...actual, authService: { ...actual.authService, getProfile: vi.fn().mockResolvedValue({ username: 'Admin', email: 'admin@example.com', role: 'ADMIN' }) } };
+});
 
 describe('historial de compras del administrador', () => {
     beforeEach(() => {
         localStorage.clear();
+        localStorage.setItem('sneakerx_jwt', 'test-token');
         window.history.replaceState({}, '', '/admin/compras');
         localStorage.setItem('store_users', JSON.stringify([
             { id: 1, name: 'Admin', role: 'Administrador', email: 'admin@example.com', password: 'secret' },
@@ -32,7 +37,7 @@ describe('historial de compras del administrador', () => {
         const user = userEvent.setup();
         render(<AdminApp />);
 
-        expect(screen.getByRole('heading', { name: 'Historial de compras' })).toBeTruthy();
+        expect(await screen.findByRole('heading', { name: 'Historial de compras' })).toBeTruthy();
         expect(screen.getByText('ana@example.com')).toBeTruthy();
         await user.click(screen.getByRole('button', { name: 'Ver boleta' }));
 

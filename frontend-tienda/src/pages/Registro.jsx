@@ -166,7 +166,7 @@ function Registro({ totalItems = 0 }) {
     return (
         <div className="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
             <Navbar totalItems={totalItems} activePath="/registro" />
-            <main className="mx-auto grid min-h-[calc(100vh-86px)] max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-[.85fr_1.15fr] lg:px-8">
+            <main className="shop-fluid-page mx-auto grid min-h-[calc(100vh-86px)] max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-[.85fr_1.15fr] lg:px-8">
                 <div className="hidden min-h-[620px] rounded-3xl bg-cover bg-center lg:block" style={{ backgroundImage: "url('/img/fondo_registro_2.png')" }} />
                 <section className="mx-auto w-full max-w-2xl rounded-3xl bg-white p-7 shadow-sm ring-1 ring-slate-200 sm:p-10">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Únete a SneakerX</p><h1 className="mt-3 text-4xl font-bold tracking-tight">Crea tu cuenta.</h1><p className="mt-3 text-slate-500">Guarda tus favoritos y descubre nuevas formas de moverte.</p>

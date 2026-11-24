@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getProducts as getLocalProducts, getCart as getLocalCart, saveCart as saveLocalCart } from './data/db';
-import { productService, cartService, getOrCreateSessionId, getSessionId } from './services/api';
+import { getProducts as getLocalProducts, saveCart as saveLocalCart } from './data/db';
+import { productService, cartService, getOrCreateSessionId } from './services/api';
 import { Producto } from './components/Producto';
 import HeroCarousel from './components/HeroCarousel';
 import Productos from './pages/Productos';
@@ -14,23 +14,15 @@ import Pago from './pages/Pago';
 import EditarPerfil from './pages/EditarPerfil';
 import MisCompras from './pages/MisCompras';
 import AdminApp from './admin/AdminApp';
-import ChatWidget from './components/ChatWidget';
-import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import './App.css'; // Mantenemos tu archivo CSS por si tienes algo ahí
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 
-const destacados = [
-    { title: 'Nike Air Force 1', description: 'El clásico que siempre encuentra una nueva forma de destacar.', buttonText: 'Compra con un 20% de descuento', images: ['/img/zapatillas/af1.webp', '/img/zapatillas/af12.webp', '/img/zapatillas/af13.webp'] },
-    { title: 'Jordan 1 Low', description: 'Un estilo clásico impecable que combina con cualquier look.', buttonText: 'Compra ahora', images: ['/img/zapatillas/jordan1.webp', '/img/zapatillas/jordan3.webp', '/img/zapatillas/jordan2.webp'] },
-    { title: 'Book 2 Tigers', description: 'Diseñadas para quienes convierten el movimiento en juego.', buttonText: 'Descubre más', images: ['/img/zapatillas/book21.webp', '/img/zapatillas/book22.webp', '/img/zapatillas/book23.webp'] },
-];
-
 function App() {
     const [productos, setProductos] = useState(() => getLocalProducts());
-    const [userId, setUserId] = useState(() => localStorage.getItem('sneakerx_userId'));
-    const [sessionId, setSessionId] = useState(() => getOrCreateSessionId());
+    const [userId] = useState(() => localStorage.getItem('sneakerx_userId'));
+    const [sessionId] = useState(() => getOrCreateSessionId());
     const [carrito, setCarrito] = useState([]);
 
     useEffect(() => {
@@ -54,19 +46,7 @@ function App() {
             .catch(() => {});
         return () => { mounted = false; };
     }, []);
-    const [destacado, setDestacado] = useState(0);
-    const [imagenDestacada, setImagenDestacada] = useState(0);
     const [mostrarMiniCarrito, setMostrarMiniCarrito] = useState(false);
-
-    useEffect(() => {
-        const productTimer = window.setInterval(() => setDestacado((current) => (current + 1) % destacados.length), 20000);
-        return () => window.clearInterval(productTimer);
-    }, []);
-
-    useEffect(() => {
-        const imageTimer = window.setInterval(() => setImagenDestacada((current) => (current + 1) % destacados[destacado].images.length), 5000);
-        return () => window.clearInterval(imageTimer);
-    }, [destacado]);
 
     const mapCartItem = (item) => ({
         id: item.producto?.id ?? item.productoId,
@@ -86,7 +66,7 @@ function App() {
             } else {
                 try {
                     data = await cartService.getGuestCart(sessionId);
-                } catch (e) {
+                } catch {
                     // 404 = carrito no existe aún, tratar como vacío
                     data = { items: [] };
                 }
@@ -152,7 +132,6 @@ function App() {
         return (
             <>
                 <AdminApp />
-                <ChatWidget />
             </>
         );
     }
@@ -162,7 +141,6 @@ function App() {
         return (
             <>
                 <MisCompras totalItems={totalItems} />
-                <ChatWidget />
             </>
         );
     }
@@ -172,7 +150,6 @@ function App() {
         return (
             <>
                 <EditarPerfil />
-                <ChatWidget />
             </>
         );
     }
@@ -187,7 +164,6 @@ function App() {
                     onCambiarCantidad={cambiarCantidad}
                     onEliminarProducto={eliminarDelCarrito}
                 />
-                <ChatWidget />
             </>
         );
     }
@@ -200,7 +176,6 @@ function App() {
                     onCambiarCantidad={cambiarCantidad}
                     onEliminarProducto={eliminarDelCarrito}
                 />
-                <ChatWidget />
             </>
         );
     }
@@ -209,7 +184,6 @@ function App() {
         return (
             <>
                 <Nosotros totalItems={totalItems} />
-                <ChatWidget />
             </>
         );
     }
@@ -218,7 +192,6 @@ function App() {
         return (
             <>
                 <Contacto totalItems={totalItems} />
-                <ChatWidget />
             </>
         );
     }
@@ -227,7 +200,6 @@ function App() {
         return (
             <>
                 <Cuenta totalItems={totalItems} />
-                <ChatWidget />
             </>
         );
     }
@@ -236,7 +208,6 @@ function App() {
         return (
             <>
                 <Login totalItems={totalItems} />
-                <ChatWidget />
             </>
         );
     }
@@ -245,7 +216,6 @@ function App() {
         return (
             <>
                 <Registro totalItems={totalItems} />
-                <ChatWidget />
             </>
         );
     }
@@ -254,7 +224,6 @@ function App() {
         return (
             <>
                 <Pago carrito={carrito} onPagoCompletado={() => { setCarrito([]); saveLocalCart([]); }} />
-                <ChatWidget />
             </>
         );
     }
@@ -266,7 +235,6 @@ function App() {
                 <main>
                     <Blogs />
                 </main>
-                <ChatWidget />
             </div>
         );
     }
@@ -280,13 +248,11 @@ function App() {
                     {}
                     <BlogDetail id={blogId} /> 
                 </main>
-                <ChatWidget />
             </div>
         );
     }
 
 
-    const coleccion = destacados[destacado];
     return (
         <div className="bg-[#f3f4f6] text-slate-900 antialiased min-h-screen">
             <Navbar totalItems={totalItems} activePath="/" />
@@ -315,11 +281,11 @@ function App() {
                 <HeroCarousel />
 
                 {/* Sección Más Vendidas */}
-                <section className="mx-auto max-w-[96rem] px-4 py-4 lg:px-6 lg:py-6" aria-labelledby="bestsellers-title">
+                <section className="mx-auto max-w-[96rem] px-4 py-4 lg:px-6 lg:py-6" data-shop-products aria-labelledby="bestsellers-title">
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Lo que todos están usando</p>
-                            <h2 id="bestsellers-title" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Más vendidas</h2>
+                            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">ENCUENTRA TU PRÓXIMO FAVORITO</p>
+                            <h2 id="bestsellers-title" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">La selección SneakerX</h2>
                         </div>
                         <a href="/productos" className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 no-underline shadow-sm transition hover:border-slate-900 hover:text-slate-900">Ver todo el catálogo <span className="ml-2" aria-hidden="true">→</span></a>
                     </div>
@@ -335,9 +301,10 @@ function App() {
                         ))}
                     </div>
                 </section>
+                <section className="shop-editorial"><div><p className="shop-eyebrow">SNEAKERX JOURNAL</p><h2>La inspiración<br/>también se lleva.</h2><p>Ideas, detalles e historias para construir tu propio estilo.</p><a href="/blog">Descubrir historias ↗</a></div><a href="/blog" className="shop-editorial-image" aria-label="Explorar el blog"><img src="/img/zapatillas/jordan1.webp" alt="Zapatillas Jordan" loading="lazy"/></a></section>
             </main>
 
-            <ChatWidget />
+
         </div>
     );
 }

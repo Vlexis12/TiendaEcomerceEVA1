@@ -1,3 +1,4 @@
+import { imagePath } from '../services/image';
 import { formatCLP } from '../data/db';
 import Navbar from '../components/Navbar';
 
@@ -10,7 +11,7 @@ function Carrito({ carrito, onCambiarCantidad, onEliminarProducto }) {
         <div className="min-h-screen bg-[#f3f4f6] text-slate-900 antialiased">
             <Navbar totalItems={carrito.reduce((sum, item) => sum + item.cantidad, 0)} activePath="/carrito" />
 
-            <main className="mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
+            <main className="shop-fluid-page mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
                 <div className="mb-10">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Tu selección</p>
                     <h1 className="mt-2 text-4xl font-bold tracking-tight">Carrito</h1>
@@ -24,7 +25,7 @@ function Carrito({ carrito, onCambiarCantidad, onEliminarProducto }) {
                             <ul className="space-y-4">
                                 {carrito.map((item) => (
                                     <li key={`${item.id}-${item.size}`} className="flex items-center gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                                        <img src={item.image.startsWith('/') ? item.image : `/${item.image}`} alt={item.name} className="h-20 w-20 rounded-xl object-cover" />
+                                        <img src={imagePath(item.image)} alt={item.name} className="h-20 w-20 rounded-xl object-cover" />
                                         <div className="min-w-0 flex-1">
                                             <h2 className="truncate text-sm font-semibold">{item.name}</h2>
                                             <p className="mt-1 text-xs text-slate-500">Talla {item.size}</p>

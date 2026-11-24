@@ -568,3 +568,15 @@ export default {
   getSessionId,
   clearSessionId,
 };
+const blogRequest = async (path, method = 'GET', data) => {
+ const response = await friendlyFetch(API_BASE + '/producto' + path, { method, headers: getAuthHeaders(), ...(data ? { body: JSON.stringify(data) } : {}) });
+ await ensureOk(response);
+ return parseResponse(response);
+};
+export const blogService = {
+ getAll: () => blogRequest('/blogs'),
+ getById: (id) => blogRequest('/blogs/' + encodeURIComponent(id)),
+ create: (data) => blogRequest('/admin/blogs', 'POST', data),
+ update: (id, data) => blogRequest('/admin/blogs/' + id, 'PUT', data),
+ remove: (id) => blogRequest('/admin/blogs/' + id, 'DELETE'),
+};
