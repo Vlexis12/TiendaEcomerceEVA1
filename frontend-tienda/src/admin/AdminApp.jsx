@@ -2,15 +2,13 @@ import AdminShell, { AdminIcon } from './AdminShell';
 import BlogsPage from './BlogsPage';
 import { imagePath } from '../services/image';
 import { useEffect, useMemo, useState } from 'react';
-import { formatCLP, getProducts as getLocalProducts } from '../data/db';
+import { formatCLP } from '../data/db';
 import { productService, adminService, authService, paymentService, contactService } from '../services/api';
-import { getPurchases } from '../data/purchases';
 import ContactPage from './ContactPage';
 import './AdminApp.css';
 import {
     createAdminEmail,
     findUserByEmail,
-    getUsers,
 } from '../data/users';
 
 const adminPaths = {
@@ -124,8 +122,8 @@ function DashboardPage({ session, isSeller }) {
     useEffect(() => {
         let mounted = true;
         productService.getPage({ page: 0, size: 1 }).then((data) => {
-            if (mounted) setProductCount(data?.totalElements ?? (Array.isArray(data?.content) ? data.content.length : getLocalProducts().length));
-        }).catch(() => { if (mounted) setProductCount(getLocalProducts().length); });
+            if (mounted) setProductCount(data?.totalElements ?? (Array.isArray(data?.content) ? data.content.length : 0));
+        }).catch(() => { if (mounted) setProductCount(0); });
 
         adminService.listUsers().then((data) => {
             if (!mounted) return;
@@ -134,7 +132,7 @@ function DashboardPage({ session, isSeller }) {
             setClientCount(list.filter((u) => !isAdminRole(u.role) && !isSellerRole(u.role)).length);
         }).catch(() => {
             if (!mounted) return;
-            const localUsers = getUsers();
+            const localUsers = [];
             setAdminCount(localUsers.filter((u) => isAdminRole(u.role)).length);
             setClientCount(localUsers.filter((u) => !isAdminRole(u.role) && !isSellerRole(u.role)).length);
         });
@@ -238,7 +236,7 @@ function QuickLink({ href, title, description }) {
 }
 
 function PurchasesPage() {
-    const [purchases, setPurchases] = useState(() => getPurchases());
+    const [purchases, setPurchases] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedPurchase, setSelectedPurchase] = useState(null);
     const [page, setPage] = useState(0);
@@ -284,7 +282,7 @@ function PurchasesPage() {
                 setPurchases(mapped);
             } catch (e) {
                 console.error('Error cargando compras:', e);
-                setPurchases(getPurchases());
+                setPurchases([]);
             } finally {
                 if (mounted) setLoading(false);
             }
@@ -353,11 +351,11 @@ function ProductsPage({ isSeller }) {
                 destacado: prod.destacado === true,
                 enCarrusel: prod.enCarrusel === true,
             }));
-            setProducts(mapped.length ? mapped : getLocalProducts().slice(p * 5, p * 5 + 5));
+            setProducts(mapped);
             setTotalPages(result.totalPages || 1);
             setPage(result.number ?? p);
         } catch {
-            const local = getLocalProducts();
+            const local = [];
             setProducts(local.slice(p * 5, p * 5 + 5));
             setTotalPages(Math.ceil(local.length / 5) || 1);
             setPage(p);
@@ -574,9 +572,9 @@ function UsersPage({ session, setSession, isSeller }) {
                 phone: u.phone,
                 password: '',
             }));
-            setUsers(mapped.length ? mapped : getUsers().map((u) => ({ ...u, role: mapRoleLabel(u.role) })));
+            setUsers(mapped);
         } catch {
-            setUsers(getUsers().map((u) => ({ ...u, role: mapRoleLabel(u.role) })));
+            setUsers([]);
         }
     };
 

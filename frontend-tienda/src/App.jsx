@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getProducts as getLocalProducts, saveCart as saveLocalCart } from './data/db';
+import { saveCart as saveLocalCart } from './data/db';
 import { productService, cartService, getOrCreateSessionId } from './services/api';
 import { Producto } from './components/Producto';
 import HeroCarousel from './components/HeroCarousel';
@@ -20,7 +20,7 @@ import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 
 function App() {
-    const [productos, setProductos] = useState(() => getLocalProducts());
+    const [productos, setProductos] = useState([]);
     const [userId] = useState(() => localStorage.getItem('sneakerx_userId'));
     const [sessionId] = useState(() => getOrCreateSessionId());
     const [carrito, setCarrito] = useState([]);
@@ -29,7 +29,7 @@ function App() {
         let mounted = true;
         productService.getAll({ size: 1000 })
             .then((data) => {
-                if (!mounted || !Array.isArray(data) || data.length === 0) return;
+                if (!mounted || !Array.isArray(data)) return;
                 const mapped = data.map((p) => ({
                     id: p.id,
                     name: p.nombre || p.name,
@@ -43,7 +43,7 @@ function App() {
                 }));
                 setProductos(mapped);
             })
-            .catch(() => {});
+            .catch(() => { if (mounted) setProductos([]); });
         return () => { mounted = false; };
     }, []);
     const [mostrarMiniCarrito, setMostrarMiniCarrito] = useState(false);
