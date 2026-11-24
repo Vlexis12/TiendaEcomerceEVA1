@@ -486,6 +486,7 @@ export const contactService = {
     return parseResponse(response);
   },
 };
+
 export const paymentService = {
   createPayment: async (data) => {
     const response = await friendlyFetch(`${API_BASE}/pago/pagos`, {
@@ -543,8 +544,12 @@ export const adminService = {
   createUser: async ({ username, password, email, role, phone, address, comuna }) => {
     const reg = await authService.register({ username, password, email, phone, address, comuna });
     const usuario = reg?.usuario || reg?.user || reg;
-    if ((role === 'ADMIN' || role === 'Administrador') && usuario?.id) {
-      await adminService.updateUser(usuario.id, { email, phone, address, comuna, role: 'ADMIN' });
+    if (usuario?.id) {
+      if (role === 'ADMIN' || role === 'Administrador') {
+        await adminService.updateUser(usuario.id, { email, phone, address, comuna, role: 'ADMIN' });
+      } else if (role === 'VENDEDOR' || role === 'Vendedor') {
+        await adminService.updateUser(usuario.id, { email, phone, address, comuna, role: 'VENDEDOR' });
+      }
     }
     return usuario;
   },
