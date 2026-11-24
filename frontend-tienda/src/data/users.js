@@ -3,6 +3,7 @@ const SESSION_KEY = 'usuarioLogueado';
 
 const defaultUsers = [
     { id: 1, name: 'Jhon Doe', role: 'Administrador', email: 'jhon.doe@adminshop.cl', password: 'admin123' },
+    { id: 2, name: 'Carlos Vendedor', role: 'Vendedor', email: 'vendedor@adminshop.cl', password: 'vendedor123' },
 ];
 
 export function getUsers() {
@@ -47,10 +48,16 @@ export function getCurrentUser() {
 }
 
 export function saveUserSession(user) {
+    const normalizedRole = user.role === 'Administrador'
+        ? 'admin'
+        : user.role === 'Vendedor'
+            ? 'vendedor'
+            : 'usuario';
+
     localStorage.setItem(SESSION_KEY, JSON.stringify({
         nombre: user.name,
         email: user.email,
-        rol: user.role === 'Administrador' ? 'admin' : 'usuario',
+        rol: normalizedRole,
     }));
 }
 

@@ -1,7 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { vi } from 'vitest';
 import Contacto from './Contacto';
+vi.mock('../services/api', () => ({
+    contactService: { sendContact: vi.fn().mockResolvedValue({}) },
+}));
 
 describe('vista de contacto', () => {
     it('confirma el envío del mensaje y permite cerrar la confirmación', async () => {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import { Producto } from '../components/Producto';
 import { formatCLP, sortProductsByPrice } from '../data/db';
 import Navbar from '../components/Navbar';
@@ -9,10 +9,25 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
     const [mostrarMiniCarrito, setMostrarMiniCarrito] = useState(false);
     const [sortOrder, setSortOrder] = useState('featured');
-    const sortedProducts = useMemo(
-        () => sortOrder === 'featured' ? productos : sortProductsByPrice(productos, sortOrder),
-        [productos, sortOrder],
+    const [page, setPage] = useState(0);
+    const PAGE_SIZE = 12;
+    const searchTerm = new URLSearchParams(window.location.search).get('buscar')?.trim().toLowerCase() || '';
+    const filteredProducts = useMemo(
+        () => productos.filter((producto) => {
+            if (!searchTerm) return true;
+            return ['name', 'description', 'brand', 'category']
+                .some((field) => String(producto[field] || '').toLowerCase().includes(searchTerm));
+        }),
+        [productos, searchTerm],
     );
+    const sortedProducts = useMemo(
+        () => sortOrder === 'featured' ? filteredProducts : sortProductsByPrice(filteredProducts, sortOrder),
+        [filteredProducts, sortOrder],
+    );
+    const totalPages = Math.max(1, Math.ceil(sortedProducts.length / PAGE_SIZE));
+    const paginatedProducts = sortedProducts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+    useEffect(() => { setPage(0); }, [sortOrder, searchTerm]);
 
     const agregarYMostrarCarrito = (producto, talla) => {
         onAgregarCarrito(producto, talla);
@@ -29,7 +44,7 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
             />
 
             {mostrarMiniCarrito && (
-                <aside id="mini-carrito" className="fixed right-4 top-20 z-40 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15" aria-label="Resumen del carrito">
+                <aside id="mini-carrito" className="fixed right-4 top-36 z-40 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15" aria-label="Resumen del carrito">
                     <div className="flex items-center justify-between bg-[#111827] px-5 py-3 text-white">
                         <div>
                             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">Tu selección</p>
@@ -43,7 +58,7 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                             <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-xl">🛒</div>
                             <p className="mt-3 text-sm font-semibold text-slate-700">Tu carrito está vacío</p>
                             <p className="mt-1 text-xs text-slate-500">Agrega una zapatilla para comenzar.</p>
-                            <button type="button" onClick={() => setMostrarMiniCarrito(false)} style={{ borderRadius: '9999px' }} className="mt-5 rounded-full bg-[#111827] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-700">
+                            <button type="button" onClick={() => setMostrarMiniCarrito(false)} className="btn btn-dark btn-sm mt-3">
                                 Seguir comprando
                             </button>
                         </div>
@@ -79,10 +94,10 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                                     <strong className="text-base text-slate-900">{formatCLP(carrito.reduce((sum, item) => sum + Number(item.price) * item.cantidad, 0))}</strong>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
-                                <button type="button" onClick={() => setMostrarMiniCarrito(false)} style={{ borderRadius: '9999px' }} className="flex min-h-10 items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-2.5 text-center text-xs font-semibold text-slate-700 transition hover:border-slate-900 hover:bg-slate-50">
+                                <button type="button" onClick={() => setMostrarMiniCarrito(false)} className="btn btn-outline-secondary btn-sm">
                                     Seguir comprando
                                 </button>
-                                <a href="/carrito" style={{ color: '#ffffff', borderRadius: '9999px' }} className="flex min-h-10 items-center justify-center rounded-full bg-[#111827] px-3 py-2.5 text-center text-xs font-semibold no-underline transition hover:bg-slate-700">
+                                <a href="/carrito" className="btn btn-dark btn-sm">
                                     Ir al carrito
                                 </a>
                                 </div>
@@ -96,8 +111,12 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                 <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Selección SneakerX</p>
-                        <h1 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">Elige tu próximo par.</h1>
-                        <p className="mt-4 max-w-xl text-slate-500">Siluetas para todos los días.</p>
+                        <h1 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">
+                            {searchTerm ? `Resultados para "${searchTerm}"` : 'Elige tu próximo par.'}
+                        </h1>
+                        <p className="mt-4 max-w-xl text-slate-500">
+                            {searchTerm ? `${sortedProducts.length} producto(s) encontrado(s).` : 'Siluetas para todos los días.'}
+                        </p>
                     </div>
                     <div className="flex flex-col gap-3 sm:items-end">
                         <span className="w-fit rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-500 ring-1 ring-slate-200">Colección 2026</span>
@@ -113,7 +132,7 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                 </div>
 
                 <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {sortedProducts.map((producto) => (
+                    {paginatedProducts.map((producto) => (
                         <Producto
                             key={producto.id}
                             producto={{ ...producto, image: imagePath(producto.image) }}
@@ -122,13 +141,14 @@ function Productos({ productos, carrito, onAgregarCarrito, onCambiarCantidad, on
                     ))}
                 </div>
             </main>
-
-            <footer className="bg-[#111827] px-6 py-8 text-slate-400 lg:px-8">
-                <div className="mx-auto flex max-w-[100rem] flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-                    <p>© 2026 SneakerX. Hecho para moverte.</p>
-                    <a href="/" className="transition hover:text-white">Volver al inicio</a>
+            <div className="mx-auto max-w-[100rem] px-4 pb-8 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-center gap-2">
+                    <button type="button" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-40">← Anterior</button>
+                    <span className="text-sm text-slate-500">Página {page + 1} de {totalPages}</span>
+                    <button type="button" disabled={page >= totalPages - 1} onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-40">Siguiente →</button>
                 </div>
-            </footer>
+            </div>
+
         </div>
     );
 }
