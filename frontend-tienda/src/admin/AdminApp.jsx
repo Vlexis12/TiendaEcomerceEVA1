@@ -538,6 +538,10 @@ function ProductsPage({ isSeller }) {
         }
     };
 
+    const totalModelos = products.length;
+    const totalStock = products.reduce((acc, item) => acc + Number(item.stock ?? 0), 0);
+    const stockBajo = products.filter((item) => Number(item.stock ?? 0) <= 5).length;
+
     return (
         <>
             <PageHeader
@@ -548,16 +552,20 @@ function ProductsPage({ isSeller }) {
             />
             <div className="px-6 py-8 lg:px-10">
                 <section className="mb-6 grid gap-4 sm:grid-cols-3">
-                    <InfoCard title="Catálogo" value="Inventario activo" detail="Sincronizado con la tienda" />
                     <InfoCard
-                        title={isSeller ? 'Permisos de vendedor' : 'Acciones disponibles'}
-                        value={isSeller ? 'Solo consulta de stock' : 'Crear · Editar · Eliminar'}
-                        detail={isSeller ? 'Sin creación ni edición de productos' : 'Cambios guardados en el catálogo'}
+                        title="Catálogo"
+                        value={`${totalModelos} ${totalModelos === 1 ? 'modelo' : 'modelos'}`}
+                        detail="Zapatillas registradas en tienda"
+                    />
+                    <InfoCard
+                        title={isSeller ? 'Inventario total' : 'Acciones disponibles'}
+                        value={isSeller ? `${totalStock} unidades` : 'Crear · Editar · Eliminar'}
+                        detail={isSeller ? 'Pares disponibles para venta' : 'Cambios guardados en el catálogo'}
                     />
                     <div className="rounded-2xl border border-slate-200 bg-slate-900 p-5 text-white shadow-sm">
-                        <p className="text-sm text-slate-400">Estado</p>
-                        <p className="mt-2 text-xl font-bold">Tienda activa</p>
-                        <p className="mt-1 text-xs text-slate-400">{isSeller ? 'Stock actualizado en tiempo real' : 'Lista para publicar novedades'}</p>
+                        <p className="text-sm text-slate-400">{isSeller ? 'Alerta de stock' : 'Estado'}</p>
+                        <p className="mt-2 text-xl font-bold">{isSeller ? `${stockBajo} por agotar` : 'Tienda activa'}</p>
+                        <p className="mt-1 text-xs text-slate-400">{isSeller ? 'Modelos con 5 o menos unidades' : 'Lista para publicar novedades'}</p>
                     </div>
                 </section>
 
